@@ -1,0 +1,12 @@
+use inc::Module::Install;
+name 'Docs';
+all_from 'lib/Docs.pm';
+build_requires 'Test::More';
+test_requires 'Test::Requires';
+use_test_base;
+auto_include_deps;
+auto_install;
+tests 't/*.t t/*/*.t';
+# author_tests('xt');
+# auto_set_repository;
+WriteAll;

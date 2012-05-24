@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+app.psgi
+t/0010-compile.t
+lib/Docs.pm
+lib/Docs/Application.pm
+lib/Docs/Application/Handler.pm
+lib/Docs/Application/Handler/Test.pm
+lib/Plack/Middleware/Static/Multi.pm
