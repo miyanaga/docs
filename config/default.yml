@@ -1,0 +1,9 @@
+formatters:
+    _default:
+        label: Plain HTML
+        class: Docs::Formatter
+    md:
+        label: Markdown
+        class: Docs::Formatter::Markdown
+books:
+    root: private/books
