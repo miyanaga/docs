@@ -8,6 +8,7 @@ use Any::Moose;
 use Sweets::Application::Components;
 use Plack::Middleware::Static::Multi;
 use Docs::Application::Handler::Test;
+use Docs::Model::Node::Books;
 
 has app_path => ( is => 'ro', isa => 'Str', required => 1 );
 has components => ( is => 'ro', isa => 'Sweets::Application::Components', lazy_build => 1, builder => sub {
@@ -19,6 +20,15 @@ has components => ( is => 'ro', isa => 'Sweets::Application::Components', lazy_b
     $components;
 }, handles => [q/config/] );
 has static_paths => ( is => 'rw', isa => 'ArrayRef', default => sub { [] } );
+has formatters => ( is => 'ro', isa => 'HashRef', default => sub { {} } );
+has books => ( is => 'ro', isa => 'Docs::Model::Node::Books', lazy_build => 1, builder => sub {
+    my $self = shift;
+    my $books = Docs::Model::Node::Books->new;
+    $books->uri_name( '' );
+    $books->file_name( $self->config->_cascade_find('books', 'root')->_scalar || 'private/books' );
+    $books->rebuild;
+    $books;
+} );
 
 our $INSTANCE;
 
@@ -44,6 +54,9 @@ sub initialize {
 
     # Set static paths.
     $self->static_paths([$self->components->dir_paths_to('ui/static')]);
+
+    # Load books.
+
 }
 
 sub compile_psgi_app {
@@ -57,6 +70,26 @@ sub compile_psgi_app {
     );
 
     $app;
+}
+
+sub formatter {
+    my $self = shift;
+    my ( $key ) = @_;
+
+    return $self->formatters->{$key} if $self->formatters->{$key};
+
+    if ( my $fmt = $self->config->_cascade_find('formatters', $key)->_hash ) {
+        if ( my $pkg = delete $fmt->{class} || delete $fmt->{package} ) {
+            if ( eval qq{require $pkg;} ) {
+                return $self->formatters->{$key} = $pkg->new(%$fmt);
+            } else {
+                print STDERR "$@\n";
+            }
+        }
+    }
+
+    die 'Formatter: _default is not found.' if $key eq '_default';
+    $self->formatters->{$key} = $self->formatter('_default');
 }
 
 no Any::Moose;

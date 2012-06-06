@@ -9,3 +9,10 @@ lib/Docs/Application.pm
 lib/Docs/Application/Handler.pm
 lib/Docs/Application/Handler/Test.pm
 lib/Plack/Middleware/Static/Multi.pm
+lib/Docs/Formatter.pm
+lib/Docs/Formatter/Markdown.pm
+lib/Docs/Model/Node.pm
+lib/Docs/Model/Node/Document.pm
+lib/Docs/Model/Node/Folder.pm
+lib/Docs/Model/Node/Book.pm
+lib/Docs/Model/Node/Books.pm
