@@ -11,6 +11,7 @@ use Sweets::Callback::Engine;
 use Plack::Middleware::Static::Multi;
 use Docs::Application::Handler::Test;
 use Docs::Model::Node::Books;
+use Docs::Context;
 
 has app_path => ( is => 'ro', isa => 'Str', required => 1 );
 has components => ( is => 'ro', isa => 'Sweets::Application::Components', lazy_build => 1, builder => sub {
@@ -114,6 +115,11 @@ sub formatter {
     }
 
     $self->formatters->{$key} = 0;
+}
+
+sub new_context {
+    my $self = shift;
+    Docs::Context->new(@_);
 }
 
 no Any::Moose;

@@ -1,4 +1,4 @@
-package Docs::Module::GroongaSearch;
+package Docs::Component::GroongaSearch;
 
 use strict;
 use warnings;

@@ -1,4 +1,4 @@
-package Docs::Module::GroongaSearch::ContextMethod;
+package Docs::Component::GroongaSearch::ContextMethod;
 
 use strict;
 use warnings;

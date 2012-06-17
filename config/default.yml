@@ -47,3 +47,8 @@ context_methods:
         package: Docs::Model::Node
         method: tags
         code: Docs::ContextMethod::Node::tags
+    core.node.normalize:
+        package: Docs::Model::Node
+        method: normalize
+        code: Docs::ContextMethod::Node::normalize
+

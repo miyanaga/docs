@@ -90,5 +90,32 @@ sub tags {
     wantarray? @tags: \@tags;
 }
 
+sub normalize {
+    my $node = shift;
+    my $ctx = shift;
+    my $original = pop;
+    my $methods = shift;
+    my $depth = shift;
+
+    my %hash;
+    for my $m ( @$methods ) {
+        if ( $node->can($m) ) {
+            $hash{$m} = $node->$m( $ctx, @_ );
+        }
+    }
+
+    $depth-- if defined $depth;
+    if ( !defined($depth) || $depth >= 0 ) {
+        my %children;
+        my $children = $node->children('uri');
+        while ( my ( $uri, $child ) = each %$children ) {
+            $children{$uri} = $child->normalize( $ctx, $methods, $depth, @_ );
+        }
+        $hash{children} = \%children;
+    }
+
+    \%hash;
+}
+
 1;
 __END__

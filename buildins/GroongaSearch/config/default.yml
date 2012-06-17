@@ -2,45 +2,45 @@ id: GroongaSearch
 groonga:
     root: data/groonga
 context_methods:
-    groonga.path:
+    groonga.book.path:
         package: Docs::Model::Node::Book
         method: groonga_path
-        code: Docs::Module::GroongaSearch::ContextMethod::groonga_path
-    groonga.console:
+        code: Docs::Component::GroongaSearch::ContextMethod::groonga_path
+    groonga.book.console:
         package: Docs::Model::Node::Book
         method: groonga_console
-        code: Docs::Module::GroongaSearch::ContextMethod::groonga_console
-    groonga.migrate:
+        code: Docs::Component::GroongaSearch::ContextMethod::groonga_console
+    groonga.book.migrate:
         package: Docs::Model::Node::Book
         method: groonga_migrate
-        code: Docs::Module::GroongaSearch::ContextMethod::groonga_migrate
-    groonga.groonga_step_paths:
+        code: Docs::Component::GroongaSearch::ContextMethod::groonga_migrate
+    groonga.node.groonga_step_paths:
         package: Docs::Model::Node
         method: groonga_step_paths
-        code: Docs::Module::GroongaSearch::ContextMethod::groonga_step_paths
-    groonga.load:
+        code: Docs::Component::GroongaSearch::ContextMethod::groonga_step_paths
+    groonga.node.load:
         package: Docs::Model::Node
         method: groonga_load
-        code: Docs::Module::GroongaSearch::ContextMethod::groonga_load
-    groonga.search:
+        code: Docs::Component::GroongaSearch::ContextMethod::groonga_load
+    groonga.node.search:
         package: Docs::Model::Node
         method: groonga_search
-        code: Docs::Module::GroongaSearch::ContextMethod::groonga_search
-    groonga.tagsearch:
+        code: Docs::Component::GroongaSearch::ContextMethod::groonga_search
+    groonga.node.tagsearch:
         package: Docs::Model::Node
         method: groonga_tagsearch
-        code: Docs::Module::GroongaSearch::ContextMethod::groonga_tagsearch
+        code: Docs::Component::GroongaSearch::ContextMethod::groonga_tagsearch
 commands:
     search:
-        handler: Docs::Module::GroongaSearch::Handler::Search
+        handler: Docs::Component::GroongaSearch::Handler::Search
     tagsearch:
-        handler: Docs::Module::GroongaSearch::Handler::TagSearch
+        handler: Docs::Component::GroongaSearch::Handler::TagSearch
     quicksearch:
-        handler: Docs::Module::GroongaSearch::Handler::QuickSearch
+        handler: Docs::Component::GroongaSearch::Handler::QuickSearch
 callbacks:
     post_init:
         priority: 5
-        code: Docs::Module::GroongaSearch::on_post_init
+        code: Docs::Component::GroongaSearch::on_post_init
     node.document.rebuild:
         priority: 8
-        code: Docs::Module::GroongaSearch::on_document_rebuild
+        code: Docs::Component::GroongaSearch::on_document_rebuild
