@@ -1,4 +1,4 @@
-package Docs::Model::Util::NodeName;
+package Docs::Model::Node::Naming;
 
 use strict;
 use warnings;

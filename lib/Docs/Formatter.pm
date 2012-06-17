@@ -6,7 +6,7 @@ use warnings;
 use Any::Moose;
 use Docs::Model::Node::Metadata;
 
-has label => ( is => 'rw', isa => 'Str', default => 'Unknown Formatter' );
+has label => ( is => 'rw', isa => 'Str', default => 'HTML Formatter' );
 has args => ( is => 'rw', default => sub { {} } );
 
 sub format {

@@ -7,6 +7,7 @@ use parent 'Docs::Model::Node';
 use Any::Moose;
 use File::Spec;
 use Docs::Model::Node::Document;
+use Docs::Model::Node::Naming;
 
 has metadata => ( is => 'rw', isa => 'Docs::Model::Node::Metadata', lazy_build => 1, builder => sub {
     my $self = shift;
@@ -19,6 +20,8 @@ has metadata => ( is => 'rw', isa => 'Docs::Model::Node::Metadata', lazy_build =
 
     $metadata;
 });
+
+sub is_folder { 1 }
 
 sub child_class {
     my $self = shift;
@@ -39,9 +42,10 @@ sub rebuild {
         my $path = File::Spec->catdir($self->file_path, $entry);
         my $pkg = $self->child_class($entry, $path) || next;
 
-        if ( my $nn = Docs::Model::Util::NodeName->parse($entry) ) {
+        if ( my $naming = Docs::Model::Node::Naming->parse($entry) ) {
             # TODO: Node name error handling.
-            my $child = $pkg->from_node_name($nn) || next;
+            my $child = $pkg->from_naming($naming) || next;
+
             $self->add($child);
             $child->rebuild;
         }
@@ -58,8 +62,8 @@ sub ensure {
         my $path = File::Spec->catdir($self->file_path, $file);
         my $pkg = $self->child_class($file, $path) || return;
 
-        my $nn = Docs::Model::Util::NodeName->parse($file) || return;
-        $child = $pkg->from_node_name($nn) || next;
+        my $naming = Docs::Model::Node::Naming->parse($file) || return;
+        $child = $pkg->from_naming($naming) || next;
         $self->add($child);
         $child->rebuild;
     }

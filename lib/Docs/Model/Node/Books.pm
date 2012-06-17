@@ -6,7 +6,7 @@ use parent 'Docs::Model::Node::Folder';
 
 use File::Spec;
 use Docs;
-use Docs::Model::Util::NodeName;
+use Docs::Model::Node::Naming;
 use Docs::Model::Node::Book;
 use Any::Moose;
 

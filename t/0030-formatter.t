@@ -7,7 +7,7 @@ use Docs;
 my $app = Docs::app;
 
 {
-    my $default = $app->formatter('_default');
+    my $default = $app->formatter('html');
     ok $default;
 
     my $source = qq(<!--

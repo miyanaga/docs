@@ -1,5 +1,12 @@
+languages:
+    en:
+        local: English
+        global: English
+    ja:
+        local: 日本語
+        global: Japanese
 formatters:
-    _default:
+    html:
         label: Plain HTML
         class: Docs::Formatter
     md:
@@ -7,3 +14,36 @@ formatters:
         class: Docs::Formatter::Markdown
 books:
     root: private/books
+context_methods:
+    core.node.title:
+        package: Docs::Model::Node
+        method: title
+        code: Docs::ContextMethod::Node::title
+    core.node.body:
+        package: Docs::Model::Node
+        method: body
+        code: Docs::ContextMethod::Node::body
+    core.node.plain_text:
+        package: Docs::Model::Node
+        method: plain_text
+        code: Docs::ContextMethod::Node::plain_text
+    core.node.plain_text_without_headlines:
+        package: Docs::Model::Node
+        method: plain_text_without_headlines
+        code: Docs::ContextMethod::Node::plain_text_without_headlines
+    core.node.author:
+        package: Docs::Model::Node
+        method: author
+        code: Docs::ContextMethod::Node::author
+    core.node.headlines:
+        package: Docs::Model::Node
+        method: headlines
+        code: Docs::ContextMethod::Node::headlines
+    core.node.raw_tags:
+        package: Docs::Model::Node
+        method: raw_tags
+        code: Docs::ContextMethod::Node::raw_tags
+    core.node.tags:
+        package: Docs::Model::Node
+        method: tags
+        code: Docs::ContextMethod::Node::tags

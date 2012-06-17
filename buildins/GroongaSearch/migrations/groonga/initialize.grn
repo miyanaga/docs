@@ -1,0 +1,4 @@
+table_create --name Migration --key_type ShortText
+column_create --table Migration --name age --type UInt32
+load --table Migration --input_type json
+[{"_key":"_default","age":0}]

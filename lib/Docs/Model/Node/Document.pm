@@ -9,8 +9,7 @@ use Docs;
 
 has formatter => ( is => 'rw', isa => 'Docs::Formatter', lazy_build => 1, builder => sub {
     my $self = shift;
-    my $app = Docs::app();
-    $app->formatter($self->extension);
+    Docs->app->formatter($self->naming->extension);
 });
 has metadata => ( is => 'rw', isa => 'Docs::Model::Node::Metadata', lazy_build => 1, builder => sub {
     my $self = shift;
@@ -35,7 +34,7 @@ sub source {
     $source;
 }
 
-sub body {
+sub formatted_body {
     my $self = shift;
     $self->formatter->format($self->source);
 }
@@ -52,6 +51,14 @@ sub ensure {
 
     # Document has no children.
     return;
+}
+
+sub from_naming {
+    my $pkg = shift;
+    my ( $naming ) = @_;
+
+    return unless Docs->app->formatter($naming->extension);
+    $pkg->SUPER::from_naming($naming);
 }
 
 no Any::Moose;

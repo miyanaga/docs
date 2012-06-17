@@ -1,0 +1,3 @@
+table_remove Terms
+table_remove Node
+table_remove Tag

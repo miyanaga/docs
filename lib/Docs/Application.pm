@@ -6,6 +6,8 @@ use parent 'Tatsumaki::Application';
 
 use Any::Moose;
 use Sweets::Application::Components;
+use Sweets::Code::Binding;
+use Sweets::Callback::Engine;
 use Plack::Middleware::Static::Multi;
 use Docs::Application::Handler::Test;
 use Docs::Model::Node::Books;
@@ -19,6 +21,16 @@ has components => ( is => 'ro', isa => 'Sweets::Application::Components', lazy_b
     $components->load_component($core->path_to('private'), 'private');
     $components;
 }, handles => [q/config/] );
+has callbacks => ( is => 'ro', isa => 'Sweets::Callback::Engine', lazy_build => 1, builder => sub {
+    my $self = shift;
+    my $engine = Sweets::Callback::Engine->new;
+    my $callbacks = $self->components->config->_cascade_set('callbacks')->_merge_hashes->_hash;
+    while ( my ( $key, $tupple ) = each %$callbacks ) {
+        $tupple->{event} ||= $key;
+        $engine->add( %$tupple );
+    }
+    $engine;
+});
 has static_paths => ( is => 'rw', isa => 'ArrayRef', default => sub { [] } );
 has formatters => ( is => 'ro', isa => 'HashRef', default => sub { {} } );
 has books => ( is => 'ro', isa => 'Docs::Model::Node::Books', lazy_build => 1, builder => sub {
@@ -52,11 +64,22 @@ sub instance {
 sub initialize {
     my $self = shift;
 
+    # Library paths.
+    push @INC, $self->components->dir_paths_to('lib');
+
     # Set static paths.
     $self->static_paths([$self->components->dir_paths_to('ui/static')]);
 
-    # Load books.
+    # Bind context methods.
+    my $methods = $self->components->config->_cascade_set('context_methods')->_merge_hashes->_hash;
+    while ( my ( $key, $tupple ) = each %$methods ) {
+        my $code = Sweets::Code::Binding->new(
+            code => $tupple->{code}
+        );
+        $code->bind( $tupple->{package}, $tupple->{method} );
+    }
 
+    $self->callbacks->run_all( 'post_init', $self );
 }
 
 sub compile_psgi_app {
@@ -75,10 +98,12 @@ sub compile_psgi_app {
 sub formatter {
     my $self = shift;
     my ( $key ) = @_;
+    $key = lc($key);
 
-    return $self->formatters->{$key} if $self->formatters->{$key};
+    return $self->formatters->{$key}
+        if defined($self->formatters->{$key});
 
-    if ( my $fmt = $self->config->_cascade_find('formatters', $key)->_hash ) {
+    if ( my $fmt = $self->config->_cascade_set('formatters', $key)->_merge_hashes->_hash ) {
         if ( my $pkg = delete $fmt->{class} || delete $fmt->{package} ) {
             if ( eval qq{require $pkg;} ) {
                 return $self->formatters->{$key} = $pkg->new(%$fmt);
@@ -88,8 +113,7 @@ sub formatter {
         }
     }
 
-    die 'Formatter: _default is not found.' if $key eq '_default';
-    $self->formatters->{$key} = $self->formatter('_default');
+    $self->formatters->{$key} = 0;
 }
 
 no Any::Moose;
