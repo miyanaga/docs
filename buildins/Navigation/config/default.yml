@@ -1,0 +1,6 @@
+id: Navigation
+context_methods:
+    navigation.node.navigation_map:
+        package: Docs::Model::Node
+        method: navigation_map
+        code: Docs::Component::Navigation::ContextMethod::navigation_map
