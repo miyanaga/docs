@@ -14,6 +14,9 @@ formatters:
         class: Docs::Formatter::Markdown
 books:
     root: private/books
+search:
+    per_page: 10
+    quick_per_page: 10
 context_methods:
     core.node.title:
         package: Docs::Model::Node

@@ -6,8 +6,10 @@ use parent 'Sweets::Tree::MultiPath::Node';
 $Sweets::Tree::MultiPath::Node::DEFAULT_NS = 'uri';
 
 use Any::Moose;
+use Docs;
 use Docs::Model::Node::Metadata;
 use Docs::Model::Node::Naming;
+use Docs::Context;
 
 has naming => ( is => 'ro', isa => 'Docs::Model::Node::Naming', lazy_build => 1, builder => sub {
     Docs::Model::Node::Naming->new
@@ -23,7 +25,7 @@ has books => ( is => 'ro', isa => 'Any', lazy_build => 1, builder => sub {
 has book => ( is => 'ro', isa => 'Any', lazy_build => 1, builder => sub {
     shift->parent_at(1) || 0;
 });
-has temporary => ( is => 'ro', isa => 'HashRef', lazy_build => 1, builder => sub { {} } );
+has stash_store => ( is => 'ro', isa => 'HashRef', lazy_build => 1, builder => sub { {} } );
 
 sub is_folder { 0 };
 
@@ -46,10 +48,41 @@ sub file_mtime {
     -e $path? ( stat $path )[8]: 0;
 }
 
+before rebuild => sub {
+    my $self = shift;
+    my $app = Docs::app();
+    $app->callbacks->run_all('node.pre_rebuild', $self);
+};
+
+after rebuild => sub {
+    my $self = shift;
+    my $app = Docs::app();
+    $app->callbacks->run_all('node.post_rebuild', $self);
+};
+
 sub rebuild {
     my $self = shift;
+    my $app = Docs::app();
+
     $self->clear_metadata;
-    $self->clear_temporary;
+    $self->clear_stash_store;
+}
+
+sub stash {
+    my $self = shift;
+    my ( $key, $value ) = @_;
+    my $stash = $self->stash_store;
+    return $stash unless defined $key;
+    $stash->{$key} = $value if defined($value);
+    $stash->{$key};
+}
+
+sub ctx_stash {
+    my $self = shift;
+    my $ctx = shift;
+    pop;
+
+    $ctx->stash( $self, @_ );
 }
 
 sub ensure { return undef; }

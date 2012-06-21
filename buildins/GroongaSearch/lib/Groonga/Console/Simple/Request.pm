@@ -3,6 +3,7 @@ package Groonga::Console::Simple::Request;
 use strict;
 use warnings;
 
+use Encode;
 use Any::Moose;
 use Groonga::Console;
 use Time::HiRes qw(time gettimeofday tv_interval);
@@ -32,13 +33,14 @@ sub to_string {
 
 sub execute {
     my $self = shift;
-    my ( $groonga ) = @_;
+    my ( $groonga, $text ) = @_;
     my @start = gettimeofday;
     my $str = $groonga->console($self->to_string);
+    $str = $groonga->console(decode('utf8', $text)) if $text;
 
     my $result = $self->result_class->new(
         request => $self,
-        raw_string => $str,
+        raw_string => $str || '',
     );
     $result->duration( tv_interval( \@start ) );
 
@@ -89,23 +91,35 @@ use base 'Groonga::Console::Simple::Result';
 use Any::Moose;
 use JSON;
 
+has index => ( is => 'rw', isa => 'Int', default => 0 );
 has raw => ( is => 'ro', isa => 'ArrayRef', lazy_build => 1, builder => sub {
     my $self = shift;
-    my $data = eval {
+    my $raw = eval {
         from_json( $self->raw_string, { utf8 => 1 } );
     };
-    ref $data eq 'ARRAY' && $data->[0] && ref $data->[0] eq 'ARRAY'? $data->[0]: [[0],[],[]];
+    ref $raw eq 'ARRAY'? $raw: [];
+});
+has results => ( is => 'ro', isa => 'ArrayRef', lazy_build => 1, builder => sub {
+    my $self = shift;
+    my $results = $self->raw->[$self->index];
+    ref $results eq 'ARRAY'? $results: [[0], [], []];
 });
 has hit => ( is => 'ro', isa => 'Int', lazy_build => 1, builder => sub {
-    shift->raw->[0]->[0] || 0;
+    shift->results->[0]->[0] || 0;
 });
 has count => ( is => 'ro', isa => 'Int', lazy_build => 1, builder => sub {
-    my $count = scalar @{shift->raw} - 2;
+    my $count = scalar @{shift->results} - 2;
     $count < 0? 0: $count;
 });
 has headers => ( is => 'ro', isa => 'ArrayRef', lazy_build => 1, builder => sub {
-    my @headers = map { $_->[0] } @{shift->raw->[1]};
+    my $self = shift;
+    my @headers = map { $_->[0] } @{$self->results->[1]};
     \@headers;
+});
+has header_types => ( is => 'ro', isa => 'HashRef', lazy_build => 1, builder => sub {
+    my $self = shift;
+    my %types = map { $_->[0] => $_->[1] } @{$self->results->[1]};
+    \%types;
 });
 
 sub hash_array {
@@ -113,12 +127,18 @@ sub hash_array {
     my @result;
 
     my @headers = @{$self->headers};
-    for ( my $i = 2; $i < scalar @{$self->raw}; $i++ ) {
-        my $row = $self->raw->[$i];
+    for ( my $i = 2; $i < scalar @{$self->results}; $i++ ) {
+        my $row = $self->results->[$i];
         my %record;
         for ( my $j = 0; $j < scalar @headers; $j++ ) {
             my $header = $headers[$j];
             my $value = $row->[$j];
+
+            if ( ref $value eq 'ARRAY' ) {
+                $value = [ map { utf8::encode($_); $_ } @$value ];
+            } elsif ( ref $value eq '' ) {
+                utf8::encode($value);
+            }
             $record{$header} = $value;
         }
         push @result, \%record;
@@ -127,7 +147,51 @@ sub hash_array {
     \@result;
 }
 
+sub drilldown {
+    my $self = shift;
+    my $pkg = ref $self;
+
+    $pkg->new(
+        request => $self->request,
+        raw_string => $self->raw_string,
+        duration => $self->duration,
+        index => $self->index + 1,
+        raw => $self->raw,
+    );
+}
+
+no Any::Moose;
+__PACKAGE__->meta->make_immutable;
+
+package Groonga::Console::Simple::Request::Load;
+
+use strict;
+use warnings;
+
+use Any::Moose;
+use base 'Groonga::Console::Simple::Request';
+use JSON;
+
+sub BUILD {
+    my $self = shift;
+
+    $self->command('load');
+    $self->result_class('Groonga::Console::Simple::Result');
+}
+
+sub execute {
+    my $self = shift;
+    my ( $groonga, $data ) = @_;
+    $data = [ $data ] if ref $data eq 'HASH';
+
+    my $json = to_json($data);
+    my $result = $self->SUPER::execute($groonga, $json);
+
+    $result;
+}
+
 no Any::Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;
+__END__

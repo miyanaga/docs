@@ -25,7 +25,7 @@ my $book = $books->find_uri('example');
     is $book->naming->title, 'Example';
 
     my @children = values %{$book->children('uri')};
-    is scalar @children, 2;
+    is scalar @children, 3;
 }
 
 my $en = $book->find_uri('en');
@@ -73,14 +73,14 @@ my $ja = $book->find_uri('ja');
     my $ctx = Docs::Context->new(language => 'ja');
     is $folder->metadata->_ctx_find($ctx, 'title')->_scalar, 'メタデータテスト';
     is $folder->metadata->_ctx_cascade_find($ctx, 'author')->_scalar, '著者';
-    is $folder->title($ctx), 'メタデータテスト';
-    is $folder->author($ctx), '著者';
+    is $folder->ctx_title($ctx), 'メタデータテスト';
+    is $folder->ctx_author($ctx), '著者';
 
     $ctx->language('en');
     is $folder->metadata->_ctx_find($ctx, 'title')->_scalar, 'Metadata Testing';
     is $folder->metadata->_ctx_cascade_find($ctx, 'author')->_scalar, 'The Author';
-    is $folder->title($ctx), 'Metadata Testing';
-    is $folder->author($ctx), 'The Author';
+    is $folder->ctx_title($ctx), 'Metadata Testing';
+    is $folder->ctx_author($ctx), 'The Author';
 }
 
 {
@@ -99,14 +99,14 @@ my $ja = $book->find_uri('ja');
     my $ctx = Docs::Context->new(language => 'ja');
     is $doc->metadata->_ctx_find($ctx, 'title')->_scalar, 'メタデータ付きドキュメント';
     is $doc->metadata->_ctx_cascade_find($ctx, 'author')->_scalar, '著者';
-    is $doc->title($ctx), 'メタデータ付きドキュメント';
-    is $doc->author($ctx), '著者';
+    is $doc->ctx_title($ctx), 'メタデータ付きドキュメント';
+    is $doc->ctx_author($ctx), '著者';
 
     $ctx->language('en');
     is $doc->metadata->_ctx_find($ctx, 'title')->_scalar, 'Document Has Meta';
     is $doc->metadata->_ctx_cascade_find($ctx, 'author')->_scalar, 'The Author';
-    is $doc->title($ctx), 'Document Has Meta';
-    is $doc->author($ctx), 'The Author';
+    is $doc->ctx_title($ctx), 'Document Has Meta';
+    is $doc->ctx_author($ctx), 'The Author';
 }
 
 {
@@ -140,47 +140,47 @@ my $ja = $book->find_uri('ja');
     my $tags;
 
     my $ctx = Docs::Context->new(language => 'en');
-    is $folder->title($ctx), 'Multi Language Folder';
-    is $folder->author($ctx), 'Folder Author';
+    is $folder->ctx_title($ctx), 'Multi Language Folder';
+    is $folder->ctx_author($ctx), 'Folder Author';
 
-    $tags = $folder->raw_tags($ctx);
+    $tags = $folder->ctx_raw_tags($ctx);
     is_deeply $tags, [qw/Folder:Tag0 Folder:Tag1/];
-    $tags = $folder->tags($ctx);
+    $tags = $folder->ctx_tags($ctx);
     is $tags->[0]->group, 'Folder';
     is $tags->[0]->label, 'Tag0';
 
 
-    is $doc->title($ctx), 'Multi Language Document';
-    is $doc->author($ctx), 'Document Author';
-    is $doc->body($ctx), qq(<h1>Headline</h1>
+    is $doc->ctx_title($ctx), 'Multi Language Document';
+    is $doc->ctx_author($ctx), 'Document Author';
+    is $doc->ctx_body($ctx), qq(<h1>Headline</h1>
 
 <p>Content</p>
 );
-    $tags = $doc->raw_tags($ctx);
+    $tags = $doc->ctx_raw_tags($ctx);
     is_deeply $tags, [qw/Document:Tag0 Document:Tag1/];
-    $tags = $doc->tags($ctx);
+    $tags = $doc->ctx_tags($ctx);
     is $tags->[0]->group, 'Document';
     is $tags->[0]->label, 'Tag0';
 
 
     $ctx->language('ja');
-    is $folder->title($ctx), '多言語フォルダ';
-    is $folder->author($ctx), 'フォルダの著者';
-    $tags = $folder->raw_tags($ctx);
+    is $folder->ctx_title($ctx), '多言語フォルダ';
+    is $folder->ctx_author($ctx), 'フォルダの著者';
+    $tags = $folder->ctx_raw_tags($ctx);
     is_deeply $tags, [qw/フォルダ:Tag0 フォルダ:Tag1/];
-    $tags = $folder->tags($ctx);
+    $tags = $folder->ctx_tags($ctx);
     is $tags->[0]->group, 'フォルダ';
     is $tags->[0]->label, 'Tag0';
 
-    is $doc->title($ctx), '多言語ドキュメント';
-    is $doc->author($ctx), 'ドキュメントの著者';
-    is $doc->body($ctx), qq(<h1>見出し</h1>
+    is $doc->ctx_title($ctx), '多言語ドキュメント';
+    is $doc->ctx_author($ctx), 'ドキュメントの著者';
+    is $doc->ctx_body($ctx), qq(<h1>見出し</h1>
 
 <p>内容</p>
 );
-    $tags = $doc->raw_tags($ctx);
+    $tags = $doc->ctx_raw_tags($ctx);
     is_deeply $tags, [qw/ドキュメント:Tag0 ドキュメント:Tag1/];
-    $tags = $doc->tags($ctx);
+    $tags = $doc->ctx_tags($ctx);
     is $tags->[0]->group, 'ドキュメント';
     is $tags->[0]->label, 'Tag0';
 }

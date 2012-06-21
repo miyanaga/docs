@@ -26,9 +26,9 @@ has callbacks => ( is => 'ro', isa => 'Sweets::Callback::Engine', lazy_build => 
     my $self = shift;
     my $engine = Sweets::Callback::Engine->new;
     my $callbacks = $self->components->config->_cascade_set('callbacks')->_merge_hashes->_hash;
-    while ( my ( $key, $tupple ) = each %$callbacks ) {
-        $tupple->{event} ||= $key;
-        $engine->add( %$tupple );
+    while ( my ( $key, $tuple ) = each %$callbacks ) {
+        $tuple->{event} ||= $key;
+        $engine->add( $tuple );
     }
     $engine;
 });
@@ -58,11 +58,16 @@ sub instance {
         app_path => $app_path
     );
 
-    $INSTANCE->initialize;
+    $INSTANCE->init;
     $INSTANCE;
 }
 
-sub initialize {
+after init => sub {
+    my $self = shift;
+    $self->callbacks->run_all( 'app.post_init', $self );
+};
+
+sub init {
     my $self = shift;
 
     # Library paths.
@@ -73,14 +78,13 @@ sub initialize {
 
     # Bind context methods.
     my $methods = $self->components->config->_cascade_set('context_methods')->_merge_hashes->_hash;
-    while ( my ( $key, $tupple ) = each %$methods ) {
+    while ( my ( $key, $tuple ) = each %$methods ) {
+        next if !$tuple->{method} || !$tuple->{code} || !$tuple->{package};
         my $code = Sweets::Code::Binding->new(
-            code => $tupple->{code}
+            code => $tuple->{code}
         );
-        $code->bind( $tupple->{package}, $tupple->{method} );
+        $code->bind( $tuple->{package}, 'ctx_' . $tuple->{method} );
     }
-
-    $self->callbacks->run_all( 'post_init', $self );
 }
 
 sub compile_psgi_app {

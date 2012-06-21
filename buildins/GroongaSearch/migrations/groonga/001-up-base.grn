@@ -1,11 +1,11 @@
-table_create --name Tag --flags TABLE_HASH_KEY --key_type ShortText
-column_create --table Tag --name group --flags COLUMN_SCALAR --type ShortText
-column_create --table Tag --name tag --flags COLUMN_SCALAR --type ShortText
-
 table_create --name Node --flags TABLE_HASH_KEY --key_type ShortText
-column_create --table Node --name path --flags COLUMN_SCALAR --type ShortText
+table_create --name Parent --flags TABLE_PAT_KEY --key_type ShortText
+table_create --name Tag --flags TABLE_HASH_KEY --key_type ShortText
+table_create --name Terms --flags TABLE_PAT_KEY|KEY_NORMALIZE --key_type ShortText --default_tokenizer TokenBigram
+
 column_create --table Node --name parents --flags COLUMN_VECTOR --type ShortText
 column_create --table Node --name title --flags COLUMN_SCALAR --type Text
+column_create --table Node --name tags --flags COLUMN_VECTOR --type Tag
 column_create --table Node --name text --flags COLUMN_SCALAR --type LongText
 column_create --table Node --name h1 --flags COLUMN_VECTOR --type Text
 column_create --table Node --name h2 --flags COLUMN_VECTOR --type Text
@@ -13,12 +13,15 @@ column_create --table Node --name h3 --flags COLUMN_VECTOR --type Text
 column_create --table Node --name h4 --flags COLUMN_VECTOR --type Text
 column_create --table Node --name h5 --flags COLUMN_VECTOR --type Text
 column_create --table Node --name h6 --flags COLUMN_VECTOR --type Text
-column_create --table Node --name tags --flags COLUMN_VECTOR --type Tag
 column_create --table Node --name updated_on --flags COLUMN_SCALAR --type Time
 column_create --table Node --name timestamp --flags COLUMN_SCALAR --type Float
 
-table_create --name Terms --flags TABLE_PAT_KEY|KEY_NORMALIZE --key_type ShortText --default_tokenizer TokenBigram
+column_create --table Parent --name parents --flags COLUMN_INDEX --type Node --source parents
+
+column_create --table Tag --name tags --flags COLUMN_INDEX --type Node --source tags
+
 column_create --table Terms --name title --flags COLUMN_INDEX|WITH_POSITION --type Node --source title
+column_create --table Terms --name tags --flags COLUMN_INDEX|WITH_POSITION --type Node --source tags
 column_create --table Terms --name text --flags COLUMN_INDEX|WITH_POSITION --type Node --source text
 column_create --table Terms --name h1 --flags COLUMN_INDEX|WITH_POSITION --type Node --source h1
 column_create --table Terms --name h2 --flags COLUMN_INDEX|WITH_POSITION --type Node --source h2

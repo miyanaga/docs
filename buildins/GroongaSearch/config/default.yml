@@ -1,6 +1,15 @@
 id: GroongaSearch
 groonga:
     root: data/groonga
+    node_columns_weight:
+        title: 10
+        h1: 7
+        h2: 6
+        h3: 5
+        h4: 4
+        h5: 3
+        h6: 2
+        text: 1
 context_methods:
     groonga.book.path:
         package: Docs::Model::Node::Book
@@ -18,18 +27,42 @@ context_methods:
         package: Docs::Model::Node
         method: groonga_step_paths
         code: Docs::Component::GroongaSearch::ContextMethod::groonga_step_paths
+    groonga.node.groonga_headlines:
+        package: Docs::Model::Node
+        method: groonga_headlines
+        code: Docs::Component::GroongaSearch::ContextMethod::groonga_headlines
     groonga.node.load:
         package: Docs::Model::Node
         method: groonga_load
         code: Docs::Component::GroongaSearch::ContextMethod::groonga_load
-    groonga.node.search:
+    node.stash_score:
         package: Docs::Model::Node
-        method: groonga_search
-        code: Docs::Component::GroongaSearch::ContextMethod::groonga_search
-    groonga.node.tagsearch:
+        method: stash_score
+        code: Docs::Component::GroongaSearch::ContextMethod::stash_score
+    node.stash_title:
         package: Docs::Model::Node
-        method: groonga_tagsearch
-        code: Docs::Component::GroongaSearch::ContextMethod::groonga_tagsearch
+        method: stash_title
+        code: Docs::Component::GroongaSearch::ContextMethod::stash_title
+    node.stash_text:
+        package: Docs::Model::Node
+        method: stash_text
+        code: Docs::Component::GroongaSearch::ContextMethod::stash_text
+    node.stash_headlines:
+        package: Docs::Model::Node
+        method: stash_headlines
+        code: Docs::Component::GroongaSearch::ContextMethod::stash_headlines
+    node.search_node:
+        package: Docs::Model::Node
+        method: search_node
+        code: Docs::Component::GroongaSearch::ContextMethod::search_node
+    node.navigation_recent:
+        package: Docs::Model::Node
+        method: navigation_recent
+        code: Docs::Component::GroongaSearch::ContextMethod::navigation_recent
+    node.navigation_tags:
+        package: Docs::Model::Node
+        method: navigation_tags
+        code: Docs::Component::GroongaSearch::ContextMethod::navigation_tags
 commands:
     search:
         handler: Docs::Component::GroongaSearch::Handler::Search
@@ -38,9 +71,9 @@ commands:
     quicksearch:
         handler: Docs::Component::GroongaSearch::Handler::QuickSearch
 callbacks:
-    post_init:
-        priority: 5
-        code: Docs::Component::GroongaSearch::on_post_init
-    node.document.rebuild:
+    node.pre_rebuild:
         priority: 8
-        code: Docs::Component::GroongaSearch::on_document_rebuild
+        code: Docs::Component::GroongaSearch::on_node_pre_rebuild
+    node.post_rebuild:
+        priority: 8
+        code: Docs::Component::GroongaSearch::on_node_post_rebuild

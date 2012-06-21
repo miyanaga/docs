@@ -8,9 +8,9 @@ sub navigation_map {
     my $ctx = shift;
     my $original = pop;
     my ( $methods, $depth ) = @_;
-    $methods ||= [qw/title uri_path/];
+    $methods ||= [qw/ctx_title uri_path/];
 
-    $node->normalize( $ctx, $methods, $depth, $original );
+    $node->ctx_normalize( $ctx, $methods, $depth, $original );
 }
 
 1;

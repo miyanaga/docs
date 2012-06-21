@@ -37,7 +37,7 @@ sub plain_text {
     my $node = shift;
     my $ctx = shift;
 
-    my $body = $node->body($ctx);
+    my $body = $node->ctx_body($ctx);
     $body =~ s!<[^>]*>! !sg;
 }
 
@@ -45,7 +45,7 @@ sub plain_text_without_headlines {
     my $node = shift;
     my $ctx = shift;
 
-    my $body = $node->body($ctx);
+    my $body = $node->ctx_body($ctx);
     $body =~ s!<(h[1-6])(?:.*?)>(.+?)</\1>!!isg;
     $body =~ s!<[^>]*>! !sg;
 
@@ -56,7 +56,7 @@ sub headlines {
     my $node = shift;
     my $ctx = shift;
 
-    my $html = $node->body($ctx);
+    my $html = $node->ctx_body($ctx);
     my @headlines;
     while ( $html =~ m!<(h[1-6])(?:.*?)>(.+?)</\1>!isg ) {
         my $h = Docs::Model::Node::Headline->new(
@@ -74,7 +74,7 @@ sub raw_tags {
     my $node = shift;
     my $ctx = shift;
 
-    my @tags = grep { $_ } $node->metadata->_ctx_find($ctx, 'tags')->_array;
+    my @tags = $node->metadata->_ctx_find($ctx, 'tags')->_array;
     wantarray? @tags: \@tags;
 }
 
@@ -85,7 +85,7 @@ sub tags {
     my @tags = map { Docs::Model::Node::Tag->new(
         node => $node,
         raw => $_
-    ) } @{$node->raw_tags($ctx)};
+    ) } @{$node->ctx_raw_tags($ctx)};
 
     wantarray? @tags: \@tags;
 }
@@ -109,7 +109,7 @@ sub normalize {
         my %children;
         my $children = $node->children('uri');
         while ( my ( $uri, $child ) = each %$children ) {
-            $children{$uri} = $child->normalize( $ctx, $methods, $depth, @_ );
+            $children{$uri} = $child->ctx_normalize( $ctx, $methods, $depth, @_ );
         }
         $hash{children} = \%children;
     }

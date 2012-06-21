@@ -7,6 +7,8 @@ use File::Spec;
 use File::Path;
 use Groonga::Console;
 use Groonga::Console::Simple::Migration;
+use Groonga::Console::Simple::Request;
+use Sweets::Pager;
 use Docs;
 use Carp;
 use Time::HiRes;
@@ -34,7 +36,7 @@ sub groonga_console {
     my $node = shift;
     my $ctx = shift;
 
-    my $path = $node->groonga_path($ctx);
+    my $path = $node->ctx_groonga_path($ctx);
     Groonga::Console->new($path)
         || Carp::confess("can't create groonga console object");
 }
@@ -42,10 +44,11 @@ sub groonga_console {
 sub groonga_migrate {
     my $node = shift;
     my $ctx = shift;
+    my $flag = 'groonga_migrated_' . $ctx->language;
 
-    return 1 if $node->temporary->{groonga_migrated}{$ctx->language};
+    return 1 if $node->stash( $flag );
 
-    my $g = $node->groonga_console($ctx);
+    my $g = $node->ctx_groonga_console($ctx);
     my @components = @{Docs->app->components->all};
     my $this;
 
@@ -60,10 +63,10 @@ sub groonga_migrate {
     unshift @sorted, $this;
 
     for my $c ( @sorted ) {
-        my $script_dir = $c->path_to('migrations/groogna');
+        my $script_dir = $c->path_to('migrations/groonga');
         next unless -d $script_dir;
 
-        my $migration = Groonga::Simple::Migration->new(
+        my $migration = Groonga::Console::Simple::Migration->new(
             key     => $c->id,
             script_dir => $script_dir,
             groonga => $g,
@@ -72,9 +75,22 @@ sub groonga_migrate {
         $migration->run;
     }
 
-    $node->temporary->{groonga_migrated}{$ctx->language} = 1;
+    $node->stash( $flag => 1 );
 
     1;
+}
+
+sub groonga_headlines {
+    my $node = shift;
+    my $ctx = shift;
+
+    my %headlines;
+    for my $h ( $node->ctx_headlines($ctx) ) {
+        $headlines{$h->tag} ||= [];
+        push @{$headlines{$h->tag}}, $h->text;
+    }
+
+    \%headlines;
 }
 
 sub groonga_step_paths {
@@ -92,58 +108,231 @@ sub groonga_load {
     my $node = shift;
     my $ctx = shift;
     my $book = $node->book || Carp::confess('book not found');
+    my @tags = $node->ctx_tags($ctx);
 
-    my $g = $node->groonga_console($ctx);
-    my @headlines = $node->headlines;
-    my @tags = $node->tags;
+    {
+        my $groonga = $book->ctx_groonga_console($ctx);
+        my %data;
+        my $tags = [map { $_->raw } @tags];
 
-    if ( @tags ) {
-        my @rows = map {
+        $data{_key} = $node->uri_path;
+        $data{parents} = $node->ctx_groonga_step_paths($ctx) || [];
+        $data{title} = $node->ctx_title($ctx) || '';
+        $data{tags} = $tags;
+        $data{text} = $node->ctx_plain_text_without_headlines($ctx) || '';
+        $data{tags} = $node->ctx_raw_tags($ctx) || [];
+        $data{updated_on} = $node->file_mtime || 0;
+        $data{timestamp} = Time::HiRes::time || 0;
+
+        my $headlines = $node->ctx_groonga_headlines($ctx);
+        for my $level (1..6) {
+            my $tag = "h$level";
+            $data{$tag} = $headlines->{$tag} || [];
+        }
+
+        my $request = Groonga::Console::Simple::Request::Load->new(
+            args => { table => 'Node' }
+        );
+        my $result = $request->execute($groonga, \%data);
+    }
+
+    {
+        my $groonga = $book->ctx_groonga_console($ctx);
+        my @data = map {
             {
-                _key    => $_->raw,
-                book    => $book->uri_name,
-                group   => $_->group,
-                label   => $_->label,
+                _key => $_->raw,
+                group => $_->group,
+                label => $_->label,
             }
         } @tags;
 
-        my $command .= "load --table Tag\n" . to_json(\@rows);
-        utf8::decode($command);
-        $g->console($command, { utf8 => 0 } );
+        my $request = Groonga::Console::Simple::Request::Load->new(
+            args => { table => 'Tag' }
+        );
+        # my $result = $request->execute($groonga, \@data);
     }
-
-    my %columns;
-    $columns{_key} = $node->uri_path;
-    $columns{path} = $node->uri_path;
-    $columns{parents} = $node->groonga_step_paths($ctx);
-    $columns{title} = $node->title($ctx);
-    $columns{text} = $node->plain_text_without_headlines($ctx);
-    for my $h (@headlines) {
-        $columns{$h->tag} ||= [];
-        push @{$columns{$h->tag}}, $h->text;
-    }
-    for my $t (@tags) {
-        $columns{tags} ||= [];
-        push @{$columns{tags}}, $t->raw;
-    }
-    $columns{updated_on} = $node->file_mtime;
-    $columns{timestamp} = Time::HiRes::time;
-
-    my $command = "load --table Node\n" . to_json([\%columns]);
-    utf8::decode($command);
-    $g->console( $command, { utf8 => 0 } );
-}
-
-sub groonga_search {
-    my $node = shift;
-    my $ctx = shift;
-
 
 }
 
-sub groonga_tagsearch {
+sub stash_score { shift->ctx_stash( shift, 'groonga_score', @_ ) }
+sub stash_title { shift->ctx_stash( shift, 'groonga_title', @_ ) }
+sub stash_text { shift->ctx_stash( shift, 'groonga_text', @_ ) }
+sub stash_headlines { shift->ctx_stash( shift, 'groonga_headlines', @_ ) }
+
+sub _keyword_search {
     my $node = shift;
     my $ctx = shift;
+    my ( $app, $groonga, $books, $book, $keyword, $pager_req ) = @_;
+
+    my $path = $node->uri_path;
+    my $weights = $app->config->_cascade_set(qw/groonga node_columns_weight/)->_merge_hashes->_hash;
+    my $match_columns = join ',', map { join '*', $_, $weights->{$_} } keys %$weights;
+
+    my $groonga_req = Groonga::Console::Simple::Request::Select->new(
+        args => {
+            offset      => $pager_req->offset,
+            limit       => $pager_req->per_page,
+            table       => 'Node',
+            query       => qq("$keyword"),
+            filter      => qq('parents\@"$path"'),
+            output_columns => '_id,_key,_score,title,text,h1',
+            match_columns => $match_columns,
+        }
+    );
+
+    $groonga_req->execute($groonga);
+}
+
+sub _tag_search {
+    my $node = shift;
+    my $ctx = shift;
+    my ( $app, $groonga, $books, $book, $tag, $pager_req ) = @_;
+
+    my $path = $node->uri_path;
+
+    my $groonga_req = Groonga::Console::Simple::Request::Select->new(
+        args => {
+            offset      => $pager_req->offset,
+            limit       => $pager_req->per_page,
+            table       => 'Node',
+            query       => qq('tags:"$tag"'),
+            filter      => qq('parents\@"$path"'),
+            output_columns => '_id,_key,_score,title,text,h1',
+            match_columns => 'tags',
+        }
+    );
+
+    $groonga_req->execute($groonga);
+}
+
+sub search_node {
+    my $node = shift;
+    my $ctx = shift;
+    my $original = pop;
+    my ( $keyword, $page, $per_page ) = @_;
+
+    my $app = Docs::app();
+    my $books = $node->books;
+    my $book = $node->book || return;
+    my $groonga = $book->ctx_groonga_console($ctx);
+
+    $keyword ||= '';
+    $page ||= 0;
+    $per_page ||= $app->config->_cascade_find(qw/search per_page/)->_scalar || 10;
+
+    my $pager_req = Sweets::Pager::Request->new(
+        base => 0,
+        page => $page,
+        per_page => $per_page,
+    );
+
+    my $groonga_res;
+    if ( $keyword =~ /^tag:([^\s]+)/ ) {
+        my $tag = $1;
+        $groonga_res = _tag_search( $node, $ctx, $app, $groonga, $books, $book, $tag, $pager_req );
+    } else {
+        $groonga_res = _keyword_search( $node, $ctx, $app, $groonga, $books, $book, $keyword, $pager_req );
+    }
+
+    my @records = map {
+        my @path = grep { $_ } split '/', $_->{_key};
+        my $node = $books->find_uri(@path) || return;
+        $node->ctx_stash_score( $ctx, $_->{_score} );
+        $node->ctx_stash_title( $ctx, $_->{title} );
+        $node->ctx_stash_text( $ctx, $_->{text} );
+        $node->ctx_stash_headlines( $ctx, $_->{h1} );
+
+        $node;
+    } @{$groonga_res->hash_array};
+
+    my $pager_res = Sweets::Pager::Result->new(
+        request => $pager_req,
+        count => $groonga_res->hit,
+        data => \@records,
+    );
+
+    $pager_res;
+}
+
+sub navigation_recent {
+    my $node = shift;
+    my $ctx = shift;
+    pop; # original
+    my ( $limit ) = @_;
+
+    my $book = $node->book || return;
+    my $books = $node->books;
+    my $groonga = $book->ctx_groonga_console($ctx);
+    my $path = $node->uri_path;
+
+    my $req = Groonga::Console::Simple::Request::Select->new(
+        args => {
+            offset      => 0,
+            limit       => $limit || 20,
+            table       => 'Node',
+            filter      => qq('parents\@"$path"'),
+            output_columns => '_id,_key,_score,title,text,h1',
+            sortby      => '-updated_on',
+        }
+    );
+
+    my $res = $req->execute($groonga);
+
+    my @records = map {
+        my @path = grep { $_ } split '/', $_->{_key};
+        my $node = $books->find_uri(@path) || return;
+        $node->ctx_stash_title( $ctx, $_->{title} );
+        $node->ctx_stash_text( $ctx, $_->{text} );
+        $node->ctx_stash_headlines( $ctx, $_->{h1} );
+
+        $node;
+    } @{$res->hash_array};
+
+    \@records;
+}
+
+sub navigation_tags {
+    my $node = shift;
+    my $ctx = shift;
+    pop; # original
+    my ( $sort ) = @_;
+
+    my $book = $node->book || return;
+    my $groonga = $book->ctx_groonga_console($ctx);
+    my $path = $node->uri_path;
+
+    my $req = Groonga::Console::Simple::Request::Select->new(
+        args => {
+            offset      => 0,
+            limit       => 0,
+            table       => 'Node',
+            filter      => qq('parents\@"$path"'),
+            output_columns => '_id',
+            drilldown   => 'tags',
+        }
+    );
+
+    my $res = $req->execute($groonga)->drilldown;
+
+    my @records = map {
+        Docs::Model::Node::Tag->new(
+            node        => $node,
+            raw         => $_->{_key},
+            node_count  => $_->{_nsubrecs},
+        );
+    } grep {
+        $_->{_key}
+    } @{$res->hash_array};
+
+    if ( $sort ) {
+        if ( lc($sort) eq 'asc' ) {
+            @records = sort { $a->node_count <=> $b->node_count } @records;
+        } else {
+            @records = sort { $b->node_count <=> $a->node_count } @records;
+        }
+    }
+
+    \@records;
 }
 
 1;

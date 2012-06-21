@@ -21,6 +21,7 @@ has full_path => ( is => 'rw', isa => 'Str', lazy_build => 1, builder => sub {
     my $book = $self->node->book || return $self->raw;
     join('/', $book->uri_name, $self->raw);
 });
+has node_count => ( is => 'ro', isa => 'Int', default => 0 );
 
 sub parse {
     my ( $group, $label ) = split(':', shift->raw);
