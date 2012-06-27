@@ -1,0 +1,30 @@
+
+.docs-loading-inline {
+    line-height: 12px;
+    vertical-align: top;
+    background: center center url(/static/img/loading-s.gif) no-repeat;
+    background-size: 12px;
+}
+
+.docs-loading-s {
+    min-width: 16px;
+    min-height: 16px;
+    background: center center url(/static/img/loading-s.gif) no-repeat;
+}
+
+.docs-loading-m {
+    min-width: 32px;
+    min-height: 32px;
+    background: center center url(/static/img/loading-m.gif) no-repeat;
+}
+
+.docs-loading-l {
+    min-width: 64px;
+    min-height: 64px;
+    background: center center url(/static/img/loading-l.gif) no-repeat;
+}
+
+.docs-inline-block {
+    display: inline-block;
+}
+

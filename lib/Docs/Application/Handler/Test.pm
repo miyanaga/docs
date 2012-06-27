@@ -24,13 +24,9 @@ sub echo {
     $self->write($self->request->param('echo'));
 }
 
-sub config {
+sub path_info {
     my $self = shift;
-
-    use Data::Dumper;
-    $self->write(Dumper(Docs->app->config));
+    $self->write($self->request->path_info);
 }
-
-
 
 1;

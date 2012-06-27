@@ -6,6 +6,7 @@ table_create --name Terms --flags TABLE_PAT_KEY|KEY_NORMALIZE --key_type ShortTe
 column_create --table Node --name parents --flags COLUMN_VECTOR --type ShortText
 column_create --table Node --name title --flags COLUMN_SCALAR --type Text
 column_create --table Node --name tags --flags COLUMN_VECTOR --type Tag
+column_create --table Node --name lead --flags COLUMN_SCALAR --type LongText
 column_create --table Node --name text --flags COLUMN_SCALAR --type LongText
 column_create --table Node --name h1 --flags COLUMN_VECTOR --type Text
 column_create --table Node --name h2 --flags COLUMN_VECTOR --type Text

@@ -35,8 +35,16 @@ sub execute {
     my $self = shift;
     my ( $groonga, $text ) = @_;
     my @start = gettimeofday;
-    my $str = $groonga->console($self->to_string);
-    $str = $groonga->console(decode('utf8', $text)) if $text;
+
+    my $command = $self->to_string;
+    $command = Encode::encode_utf8($command) if utf8::is_utf8($command);
+    my $str = $groonga->console($command);
+
+    if ( $text ) {
+        $command = $text;
+        $command = Encode::encode_utf8($command) if utf8::is_utf8($command);
+        $str = $groonga->console($command);
+    }
 
     my $result = $self->result_class->new(
         request => $self,
@@ -90,6 +98,7 @@ use base 'Groonga::Console::Simple::Result';
 
 use Any::Moose;
 use JSON;
+use Encode;
 
 has index => ( is => 'rw', isa => 'Int', default => 0 );
 has raw => ( is => 'ro', isa => 'ArrayRef', lazy_build => 1, builder => sub {
@@ -134,11 +143,12 @@ sub hash_array {
             my $header = $headers[$j];
             my $value = $row->[$j];
 
-            if ( ref $value eq 'ARRAY' ) {
-                $value = [ map { utf8::encode($_); $_ } @$value ];
-            } elsif ( ref $value eq '' ) {
-                utf8::encode($value);
-            }
+#            if ( ref $value eq 'ARRAY' ) {
+#                $value = [ map { utf8::is_utf8($_)? $_: Encode::decode_utf8($_) } @$value ];
+#            } elsif ( ref $value eq '' ) {
+#                $value = Encode::decode_utf8($value)
+#                    unless utf8::is_utf8($value);
+#            }
             $record{$header} = $value;
         }
         push @result, \%record;

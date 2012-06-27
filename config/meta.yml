@@ -1,0 +1,11 @@
+languages: en, ja
+format:
+    datetime: %Y/%m/%d %H:%M:%S
+    datetime.ja: %Y年%m月%d日 %H:%M:%S
+    date: %Y/%m/%d
+    date.ja: %Y年%m月%d日
+tag_group_classes:
+    _all: label
+copyright: %Y <a href="http://www.ideamans.com/">ideaman's Inc.</a>
+lead_formatter: md
+title: Docs

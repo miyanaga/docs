@@ -28,7 +28,7 @@ sub metadata {
     my $meta = Docs::Model::Node::Metadata->new;
     if ( $source =~ s/^\s*<!--(.*?)-->\n*//s ) {
         my $yaml = $1;
-        eval { $meta->_from_yaml($yaml) };
+        eval { $meta->from_yaml($yaml) };
     }
 
     $meta;

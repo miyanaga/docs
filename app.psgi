@@ -5,4 +5,4 @@ use warnings;
 use FindBin::libs;
 use Docs;
 
-return Docs->app->psgi_app;
+return Docs::app()->psgi_app;

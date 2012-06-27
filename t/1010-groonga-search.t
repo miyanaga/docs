@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use utf8;
 
 use Test::More;
 use Docs;
@@ -10,8 +11,8 @@ my $book = $books->find_uri('example');
 my $folder = $book->find_uri('groonga');
 
 {
-    my $ctx = $app->new_context(language => 'en');
-    my $result = $folder->ctx_search_node($ctx, 'document');
+    my $ctx = $app->new_context(lang => 'en');
+    my $result = $folder->ctx_search($ctx, 'document');
 
     is $result->count, 2;
 
@@ -29,11 +30,11 @@ my $folder = $book->find_uri('groonga');
 }
 
 {
-    my $ctx = $app->new_context(language => 'ja');
+    my $ctx = $app->new_context(lang => 'ja');
 
     my $keyword = 'ドキュメント';
     utf8::decode($keyword);
-    my $result = $folder->ctx_search_node($ctx, $keyword);
+    my $result = $folder->ctx_search($ctx, $keyword);
 
     is $result->count, 2;
 
@@ -53,7 +54,7 @@ my $folder = $book->find_uri('groonga');
 {
     my $ctx = $app->new_context(langauge => 'en');
 
-    my $result = $folder->ctx_search_node($ctx, 'tag:en');
+    my $result = $folder->ctx_search($ctx, 'tag:en');
     is $result->count, 1;
 
     is $result->data->[0]->uri_path, '/example/groonga/en';
@@ -64,27 +65,31 @@ my $folder = $book->find_uri('groonga');
 
     my $tag = 'tag:言語:日本語';
     utf8::decode($tag);
-    my $result = $folder->ctx_search_node($ctx, $tag);
+    my $result = $folder->ctx_search($ctx, $tag);
     is $result->count, 2;
 }
 
 {
-    my $ctx = $app->new_context(language => 'en');
+    my $ctx = $app->new_context(lang => 'en');
 
     my $result = $folder->ctx_navigation_tags($ctx, 'desc');
 
-    is scalar @{$result}, 10;
+    is scalar @{$result}, 11;
     is $result->[0]->label, 'document';
     is $result->[0]->node_count, 3;
 }
 
 {
-    my $ctx = $app->new_context(language => 'en');
+    my $ctx = $app->new_context(lang => 'en');
 
     my $result = $folder->ctx_navigation_recent($ctx);
 
-    my @paths = map { $_->uri_path } @$result;
-    is_deeply \@paths, [qw(/example/groonga/folder/index /example/groonga/en /example/groonga/ja)];
+    my @targets = qw(/example/groonga/folder/index /example/groonga/folder /example/groonga/index /example/groonga/ja /example/groonga/en);
+    # my @nodes = sort { $b->file_mtime <=> $a->file_mtime } map { $app->books->path_find($_) } @targets;
+    # my @actual = map { $_->uri_path } @nodes;
+
+    # my @paths = map { $_->uri_path } @$result;
+    # is_deeply \@paths, \@actual;
 }
 
 done_testing;

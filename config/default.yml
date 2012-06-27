@@ -1,10 +1,27 @@
 languages:
     en:
-        local: English
-        global: English
+        local_label: English
+        global_label: English
     ja:
-        local: 日本語
-        global: Japanese
+        local_label: 日本語
+        global_label: Japanese
+preferred_language: en
+ui:
+    theme: bootstrap
+    helper_methods:
+        core.link_to_node:
+            method: link_to_node
+            code: Docs::HelperMethod::Node::link_to_node
+        core.link_to_tag:
+            method: link_to_tag
+            code: Docs::HelperMethod::Node::link_to_tag
+        core.bootstrap.icon:
+            theme: bootstrap
+            method: theme_icon
+            code: Docs::HelperMethod::Common::bootstrap_icon
+        core.format_datetime:
+            method: format_datetime
+            code: Docs::HelperMethod::Common::format_datetime
 formatters:
     html:
         label: Plain HTML
@@ -18,14 +35,50 @@ search:
     per_page: 10
     quick_per_page: 10
 context_methods:
+    core.node.url:
+        package: Docs::Model::Node
+        method: url
+        code: Docs::ContextMethod::Node::url
+    core.node.hidden:
+        package: Docs::Model::Node
+        method: hidden
+        code: Docs::ContextMethod::Node::hidden
+    core.node.children:
+        package: Docs::Model::Node
+        method: children
+        code: Docs::ContextMethod::Node::children
+    core.node.number:
+        package: Docs::Model::Node
+        method: number
+        code: Docs::ContextMethod::Node::number
+    core.node.numbering:
+        package: Docs::Model::Node
+        method: numbering
+        code: Docs::ContextMethod::Node::numbering
+    core.node.updated_on:
+        package: Docs::Model::Node
+        method: updated_on
+        code: Docs::ContextMethod::Node::updated_on
     core.node.title:
         package: Docs::Model::Node
         method: title
         code: Docs::ContextMethod::Node::title
+    core.node.lead:
+        package: Docs::Model::Node
+        method: lead
+        code: Docs::ContextMethod::Node::lead
+    core.node.plain_lead:
+        package: Docs::Model::Node
+        method: plain_lead
+        code: Docs::ContextMethod::Node::plain_lead
     core.node.body:
         package: Docs::Model::Node
         method: body
         code: Docs::ContextMethod::Node::body
+    core.node.body_without_lead:
+        package: Docs::Model::Node
+        method: body_without_lead
+        code: Docs::ContextMethod::Node::body_without_lead
     core.node.plain_text:
         package: Docs::Model::Node
         method: plain_text
@@ -38,6 +91,14 @@ context_methods:
         package: Docs::Model::Node
         method: author
         code: Docs::ContextMethod::Node::author
+    core.node.author_name:
+        package: Docs::Model::Node
+        method: author_name
+        code: Docs::ContextMethod::Node::author_name
+    core.node.author_email:
+        package: Docs::Model::Node
+        method: author_email
+        code: Docs::ContextMethod::Node::author_email
     core.node.headlines:
         package: Docs::Model::Node
         method: headlines
@@ -54,4 +115,28 @@ context_methods:
         package: Docs::Model::Node
         method: normalize
         code: Docs::ContextMethod::Node::normalize
+    core.node.date_format:
+        package: Docs::Model::Node
+        method: date_format
+        code: Docs::ContextMethod::Node::date_format
+    core.node.datetime_format:
+        package: Docs::Model::Node
+        method: datetime_format
+        code: Docs::ContextMethod::Node::datetime_format
+    core.node.copyright:
+        package: Docs::Model::Node
+        method: copyright
+        code: Docs::ContextMethod::Node::copyright
+    core.node.seealso:
+        package: Docs::Model::Node
+        method: seealso
+        code: Docs::ContextMethod::Node::seealso
+    core.node.next:
+        package: Docs::Model::Node
+        method: next
+        code: Docs::ContextMethod::Node::next
+    core.node.prev:
+        package: Docs::Model::Node
+        method: prev
+        code: Docs::ContextMethod::Node::prev
 

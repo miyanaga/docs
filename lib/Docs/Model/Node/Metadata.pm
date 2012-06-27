@@ -6,30 +6,33 @@ use parent 'Sweets::Variant::Cascading';
 
 use Any::Moose;
 
-has 'node' => ( is => 'rw', isa => 'Docs::Model::Node' );
+has node => ( is => 'rw', isa => 'Docs::Model::Node' );
 
-sub _cascade_to {
-    my $node = shift->node || return;
-    my $parent = $node->parent || return;
+sub cascade_to {
+    my $self = shift;
+    my $node = $self->node || return;
+    my $parent = $node->parent;
+    return $node->system_meta unless $parent;
     $parent->metadata;
 }
 
-sub _ctx_find {
+sub ctx_find {
     my $self = shift;
     my $ctx = shift;
 
     my $last = pop;
-    $last = [ join('.', $last, $ctx->language), $last ] unless ref $last;
-    $self->SUPER::_find( @_, $last );
+    $last = [ join('.', $last, $ctx->language->key), $last ] unless ref $last;
+    $self->SUPER::find( @_, $last );
 }
 
-sub _ctx_cascade_find {
+sub ctx_cascade_find {
     my $self = shift;
     my $ctx = shift;
 
     my $last = pop;
-    $last = [ join('.', $last, $ctx->language), $last ] unless ref $last;
-    $self->SUPER::_cascade_find( @_, $last );
+    $last = [ join('.', $last, $ctx->language->key), $last ] unless ref $last;
+
+    $self->SUPER::cascade_find( @_, $last );
 }
 
 no Any::Moose;

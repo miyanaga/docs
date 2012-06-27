@@ -3,34 +3,184 @@ package Docs::ContextMethod::Node;
 use strict;
 use warnings;
 
+use DateTime;
+use Sweets::String qw(trim);
 use Docs::Model::Node::Tag;
 use Docs::Model::Node::Headline;
+
+sub url {
+    my $node = shift;
+    my $ctx = shift;
+
+    $node->uri_path;
+}
+
+sub hidden {
+    my $node = shift;
+    my $ctx = shift;
+
+    $node->metadata->ctx_find($ctx, 'hidden')->as_scalar;
+}
+
+sub children {
+    my $node = shift;
+    my $ctx = shift;
+
+    my @children = grep {
+        !$_->ctx_hidden($ctx) && !$_->is_index;
+    } @{$node->sorted_children('uri')};
+
+    wantarray? @children: \@children;
+}
+
+sub number {
+    my $node = shift;
+    my $ctx = shift;
+    pop;
+
+    my $number = 1;
+    return '' if $node->depth < 2;
+    my $parent = $node->parent || return '';
+    my @children = $parent->ctx_children($ctx);
+    foreach (@children) {
+        # TODO: Pluggable numberer
+        return "$number." if $_ == $node;
+        $number++;
+    }
+
+    return '';
+}
+
+sub numbering {
+    my $node = shift;
+    my $ctx = shift;
+    pop;
+
+    my @parents = reverse $node->parents_and_self;
+    join('', map { $_->ctx_number($ctx) } @parents );
+}
+
+sub updated_on {
+    shift->file_mtime;
+}
 
 sub title {
     my $node = shift;
     my $ctx = shift;
 
-    $node->metadata->_ctx_find($ctx, 'title')->_scalar
+    my $title = $node->metadata->ctx_find($ctx, 'title')->as_scalar
         || $node->naming->title;
+
+    $title = $node->parent->ctx_title($ctx)
+        if $node->is_index && $node->parent && $title eq $node->uri_name;
+
+    $title;
 }
 
 sub author {
     my $node = shift;
     my $ctx = shift;
+    pop;
 
-    $node->metadata->_ctx_cascade_find($ctx, 'author')->_scalar || '';
+    my $author = $node->ctx_stash($ctx, 'author');
+    return $author if defined($author);
+
+    $author = $node->metadata->ctx_cascade_find($ctx, 'author')->as_scalar || '';
+    $node->ctx_stash($ctx, 'author', $author);
+}
+
+sub author_name {
+    my $node = shift;
+    my $ctx = shift;
+
+    my $name = $node->ctx_stash($ctx, 'author_name');
+    return $name if defined($name);
+
+    $name = $node->ctx_author($ctx);
+    if ( $name =~ s/<([^>]+)>//s ) {
+        $name = trim($name);
+    }
+
+    $node->ctx_stash($ctx, 'author_name', $name);
+}
+
+sub author_email {
+    my $node = shift;
+    my $ctx = shift;
+
+    my $email = $node->ctx_stash($ctx, 'author_email');
+    return $email if defined($email);
+
+    $email = $node->ctx_author($ctx);
+    if ( $email =~ /<([^>]+)>/s ) {
+        $email = trim($1);
+    }
+
+    $node->ctx_stash($ctx, 'author_email', $email);
+}
+
+sub lead {
+    my $node = shift;
+    my $ctx = shift;
+
+    my $lead = $node->ctx_stash($ctx, 'lead');
+    return $lead if defined($lead);
+
+    unless ($lead = $node->metadata->ctx_find($ctx, 'lead')->as_scalar ) {
+        #my $body = $node->ctx_body($ctx);
+        #if ( $body =~ /^(.*)<h1/is ) {
+        #    $lead = $1;
+        #} else {
+        #    $lead = '';
+        #}
+    }
+
+    $node->ctx_stash($ctx, 'lead', $lead);
+    $lead;
+}
+
+sub plain_lead {
+    my $node = shift;
+    my $ctx = shift;
+
+    my $lead = $node->ctx_lead($ctx) || return '';
+    $lead =~ s!<[^>]*>! !sg;
+    $lead =~ s!^\s+!!s;
+    $lead =~ s!\s+$!!s;
+
+    $lead;
+}
+
+sub body_without_lead {
+    my $node = shift;
+    my $ctx = shift;
+
+    my $body = $node->ctx_stash($ctx, 'body_without_lead');
+    return $body if defined($body);
+
+    $body = $node->ctx_body($ctx);
+    $body =~ s/^(.*)(?=<h1)//is;
+
+    $node->ctx_stash($ctx, 'body_without_lead', $body);
+    $body;
 }
 
 sub body {
     my $node = shift;
     my $ctx = shift;
 
+    my $body = $node->ctx_stash($ctx, 'body');
+    return $body if defined($body);
+
     my $source = $node->source || return '';
 
     # Language filter.
-    $source =~ s|<lang:([a-z]+)>\s*(.*?)\s*</lang:\1>|{$1 eq $ctx->language? $2: ''}|iges;
+    $source =~ s|<lang:([a-z]+)>\s*(.*?)\s*</lang:\1>|{$1 eq $ctx->language->key? $2: ''}|iges;
 
-    $node->formatter->format($source);
+    $body = $node->formatter->format($source);
+
+    $node->ctx_stash($ctx, 'body', $body || '');
+    $body;
 }
 
 sub plain_text {
@@ -74,7 +224,7 @@ sub raw_tags {
     my $node = shift;
     my $ctx = shift;
 
-    my @tags = $node->metadata->_ctx_find($ctx, 'tags')->_array;
+    my @tags = $node->metadata->ctx_find($ctx, 'tags')->as_array;
     wantarray? @tags: \@tags;
 }
 
@@ -116,6 +266,76 @@ sub normalize {
 
     \%hash;
 }
+
+sub _datetime_format {
+    my $format = shift;
+    my $node = shift;
+    my $ctx = shift;
+    pop;
+    my ( $epoch ) = @_;
+    $epoch ||= time;
+
+    $node->metadata->ctx_cascade_find($ctx, 'format', $format)->as_scalar || $format;
+}
+
+sub datetime_format {
+    _datetime_format('datetime', @_);
+}
+
+sub date_format {
+    _datetime_format('date', @_);
+}
+
+sub format_epoch {
+    my $node = shift;
+    my $ctx = shift;
+    my $orig = pop;
+    my ( $epoch, $format ) = @_;
+
+    _format_datetime( $format, $node, $ctx, $epoch, $orig );
+}
+
+sub copyright {
+    my $node = shift;
+    my $ctx = shift;
+    pop;
+
+    my $copyright = $node->metadata->ctx_cascade_find($ctx, 'copyright')->as_scalar || return '';
+    my $dt = DateTime->now;
+    $dt->strftime($copyright);
+}
+
+sub seealso {
+    my $node = shift;
+    my $ctx = shift;
+    pop;
+
+    my $app = Docs::app();
+    my $seealso = $node->metadata->ctx_find($ctx, 'seealso')->as_array || [];
+    my @results = grep { $_ } map { $app->books->path_find($_) } @$seealso;
+
+    wantarray? @results: \@results;
+}
+
+sub _sibling {
+    my $method = shift;
+    my $node = shift;
+    my $ctx = shift;
+    pop;
+
+    my $target;
+    while ( $node = $node->$method() ) {
+        unless ( $node->ctx_hidden($ctx) ) {
+            $target = $node;
+            last;
+        }
+    }
+
+    $target;
+}
+
+sub next { _sibling('next_sibling', @_); }
+sub prev { _sibling('prev_sibling', @_); }
 
 1;
 __END__

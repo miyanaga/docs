@@ -11,12 +11,12 @@ has file => ( is => 'rw', isa => 'Str' );
 has title => ( is => 'rw', isa => 'Str' );
 has name => ( is => 'rw', isa => 'Str' );
 has order => ( is => 'rw', isa => 'Int', default => 0 );
-has language => ( is => 'rw', isa => 'Str' );
+has lang => ( is => 'rw', isa => 'Str' );
 has extension => ( is => 'rw', isa => 'Str' );
 has error => ( is => 'rw', isa => 'Str' );
 has need_error => ( is => 'rw', isa => 'Bool', default => 0 );
 
-around [qw/title name language extension/] => sub {
+around [qw/title name lang extension/] => sub {
     my $orig = shift;
     my $self = shift;
     return $self->$orig unless @_;
@@ -30,6 +30,9 @@ sub parse {
     my $self = $pkg->new;
     my ( $file_path, $need_error ) = @_;
     $self->need_error($need_error);
+
+    utf8::decode($file_path)
+        unless utf8::is_utf8($file_path);
 
     my @paths = File::Spec->splitdir($file_path);
     my $full_name = pop @paths || return $self->with_error("Required file name or path");
@@ -47,7 +50,7 @@ sub parse {
 
     # Extension and language.
     $self->extension(uri_unescape(pop @by_dots || ''));
-    $self->language(pop @by_dots || '');
+    $self->lang(pop @by_dots || '');
 
     # Order
     if ( $file_name =~ s/^([0-9]+)-// ) {

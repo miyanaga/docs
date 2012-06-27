@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use utf8;
 
 use Test::More;
 
@@ -22,7 +23,7 @@ use Docs::Model::Node::Naming;
     is $naming->title, 'Title';
     is $naming->name, 'name';
     is $naming->extension, 'ext';
-    is $naming->language, '';
+    is $naming->lang, '';
     is $naming->order, 0;
 }
 
@@ -33,7 +34,7 @@ use Docs::Model::Node::Naming;
     is $naming->title, 'Title';
     is $naming->name, 'name';
     is $naming->extension, 'ext';
-    is $naming->language, '';
+    is $naming->lang, '';
     is $naming->order, 0;
 }
 
@@ -43,7 +44,7 @@ use Docs::Model::Node::Naming;
     is $naming->title, 'Title';
     is $naming->name, 'name';
     is $naming->extension, '';
-    is $naming->language, '';
+    is $naming->lang, '';
     is $naming->order, 0;
 }
 
@@ -53,7 +54,7 @@ use Docs::Model::Node::Naming;
     is $naming->title, '日本語';
     is $naming->name, 'name';
     is $naming->extension, 'ext';
-    is $naming->language, '';
+    is $naming->lang, '';
     is $naming->order, 0;
 }
 
@@ -63,7 +64,7 @@ use Docs::Model::Node::Naming;
     is $naming->title, '日本語';
     is $naming->name, 'name';
     is $naming->extension, '';
-    is $naming->language, '';
+    is $naming->lang, '';
     is $naming->order, 0;
 }
 
@@ -73,7 +74,7 @@ use Docs::Model::Node::Naming;
     is $naming->title, 'Title';
     is $naming->name, 'name';
     is $naming->extension, 'ext';
-    is $naming->language, '';
+    is $naming->lang, '';
     is $naming->order, 1;
 }
 
@@ -90,7 +91,7 @@ use Docs::Model::Node::Naming;
     is $naming->title, 'Title';
     is $naming->name, 'name';
     is $naming->extension, '';
-    is $naming->language, '';
+    is $naming->lang, '';
     is $naming->order, 1;
 }
 
@@ -100,7 +101,7 @@ use Docs::Model::Node::Naming;
     is $naming->title, 'Title';
     is $naming->name, 'name';
     is $naming->extension, 'ext';
-    is $naming->language, 'ja';
+    is $naming->lang, 'ja';
 }
 
 {

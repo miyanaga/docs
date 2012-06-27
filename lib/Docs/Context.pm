@@ -2,26 +2,106 @@ package Docs::Context;
 
 use strict;
 use warnings;
+use parent qw(Sweets::Aspect::Stashable::AnyEvent);
 
 use Any::Moose;
 
-use Docs::Model::Node::Folder;
-use Docs::Model::Node::Document;
-
-has document => ( is => 'rw', isa => 'Docs::Model::Node' );
-has folder => ( is => 'rw', isa => 'Docs::Model::Folder' );
-has language => ( is => 'rw', isa => 'Str', default => 'en' );
-has stash_store => ( is => 'ro', isa => 'HashRef', default => sub { {} } );
-
-sub stash {
+has cookies_expires_days => ( is => 'rw', isa => 'Int', default => 365 );
+has cookieing => ( is => 'ro', isa => 'ArrayRef', default => sub { [qw/lang search_per_page navigation_tab/] } );
+has lang => ( is => 'rw', isa => 'Str', default => sub {
+    Docs::app()->preferred_lang;
+});
+has language => ( is => 'rw', isa => 'Docs::Model::Language', lazy_build => 1, builder => sub {
     my $self = shift;
-    my $store_or_object = scalar shift;
-    my ( $key, $value ) = @_;
+    my $app = Docs::app();
+    $app->language($self->lang) || $app->preferred_language;
+});
+has node => ( is => 'rw', isa => 'Docs::Model::Node', lazy_build => 1, builder => sub {
+    Docs::app()->books;
+});
+has handler => ( is => 'rw', isa => 'Docs::Application::Handler', trigger => sub {
+    shift->from_cookies;
+});
+has path_info => ( is => 'rw', isa => 'Str', default => '/' );
+has paths => ( is => 'rw', isa => 'ArrayRef', lazy_build => 1, builder => sub {
+    [ grep { $_ } split '/', shift->path_info ];
+});
+has search_per_page => ( is => 'rw', isa => 'Int', default => 10 );
+has navigation_tab => ( is => 'rw', isa => 'Str', default => '' );
 
-    my $hash = ( $self->stash_store->{$store_or_object} ||= {} );
-    return $hash unless defined $key;
-    $hash->{$key} = $value if defined $value;
-    $hash->{$key};
+has app => ( is => 'rw', isa => 'Docs::Application', lazy_build => 1, builder => sub {
+    Docs::app();
+});
+
+sub cookies_expires_on {
+    time + 60 * 60 * 24 * shift->cookies_expires_days
+}
+
+
+sub document {
+    my $node = shift->node || return;
+    $node->is_folder
+        ? $node->find_uri('index') || $node
+        : $node;
+}
+
+sub has_node_in_path {
+    my $self = shift;
+    my ( $node ) = shift || return 0;
+    my @paths = split '/', $self->path_info;
+
+    # Ignore last index
+    pop @paths if $paths[-1] && $paths[-1] eq 'index';
+
+    $node->is_in_uri_path(@paths);
+}
+
+sub folder {
+    my $node = shift->node || return;
+    $node->is_folder? $node: $node->parent;
+}
+
+sub book {
+    my $node = shift->node || return;
+    $node->book;
+}
+
+sub books {
+    my $self = shift;
+    $self->node? $self->node->books: $self->app->books;
+}
+
+sub from_cookies {
+    my $self = shift;
+    my $handler = $self->handler || return;
+    my $parameters = $handler->request->parameters || return;
+    my $cookies = $handler->request->cookies || return;
+
+    for my $prop ( @{$self->cookieing} ) {
+        next unless eval { $self->can($prop) };
+        my $name = "_$prop";
+        if ( defined( my $cookie = $cookies->{$name} ) ) {
+            $self->$prop($cookie);
+        }
+    }
+}
+
+sub to_cookies {
+    my $self = shift;
+    my $handler = $self->handler || return;
+    my $cookies = $handler->response->cookies || return;
+    my $props = \@_ || $self->cookieing;
+
+    for my $prop ( @$props ) {
+        next unless eval { $self->can($prop) };
+
+        my $name = "_$prop";
+        $cookies->{$name} = {
+            value => $self->$prop,
+            path => '/',
+            expires => $self->cookies_expires_on,
+        };
+    }
 }
 
 no Any::Moose;

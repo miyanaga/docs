@@ -1,0 +1,112 @@
+#nav-opener {
+    float: left;
+}
+
+ul.nodes ul.nodes {
+    margin-left: 10px;
+}
+
+ui.nodes ui.nodes.nav {
+    margin-bottom: 0px;
+}
+
+#node-footer .signature {
+    text-align: right;
+}
+
+.tab-content {
+    overflow: visible;
+    height: auto;
+}
+
+.docs-tag-large {
+    font-size: 205%;
+}
+
+.docs-tag-cloud .docs-tag {
+    display: inline-block;
+    margin: 2px;
+    line-height: 150%;
+}
+
+.docs-tag-scale-2 {
+    font-size: 115%;
+}
+.docs-tag-scale-3 {
+    font-size: 130%;
+}
+.docs-tag-scale-4 {
+    font-size: 145%;
+}
+.docs-tag-scale-5 {
+    font-size: 160%;
+}
+.docs-tag-scale-6 {
+    font-size: 175%;
+}
+.docs-tag-scale-7 {
+    font-size: 190%;
+}
+.docs-tag-scale-8 {
+    font-size: 205%;
+}
+.docs-tag-scale-9 {
+    font-size: 220%;
+}
+.docs-tag-scale-10 {
+    font-size: 235%;
+}
+
+.docs-search-box input {
+    height: 25px;
+    font-size: 22px;
+}
+
+.docs-search-box button {
+    height: 35px;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.docs-pager-hit strong {
+    color: #333;
+}
+
+body.docs-search-keyword .docs-searched-tag {
+    display: none;
+}
+
+body.docs-search-tag .docs-search-box {
+    display: none;
+}
+
+article#node section h1,
+.node-list h1 {
+    font-size: 22px;
+    margin-top: 24px;
+    margin-bottom: 8px;
+    border-bottom: 1px dashed #ccc;
+}
+
+article#node section h1:first-child {
+    margin-top: 0px;
+}
+
+article#node section h2,
+.node-list h2 {
+    font-size: 18px;
+    margin-top: 12px;
+    margin-bottom: 4px;
+}
+
+article#node section h3 {
+    font-size: 14px;
+    margin-top: 6px;
+    margin-bottom: 2px;
+}
+
+article#node section h4 {
+    font-size: 14px;
+    margin-top: 6px;
+    margin-bottom: 2px;
+}

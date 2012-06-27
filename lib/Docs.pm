@@ -4,10 +4,11 @@ use 5.012004;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $NAME = 'Docs';
+our $VERSION = '0.50';
+our $APP_CLASS = 'Docs::Application';
 
 use Docs::Application;
-our $APP_CLASS = 'Docs::Application';
 
 sub app {
     $APP_CLASS->instance(@_);

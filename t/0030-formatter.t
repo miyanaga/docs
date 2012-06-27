@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use utf8;
 
 use Test::More;
 use Docs;
@@ -18,7 +19,7 @@ tags: TAGS
     is $default->format($source), '<h1>Example</h1>';
 
     my $meta = $default->metadata($source);
-    is $meta->tags->_scalar, 'TAGS';
+    is $meta->find('tags')->as_scalar, 'TAGS';
 }
 
 {
@@ -33,7 +34,7 @@ tags: TAGS
 ';
 
     my $meta = $md->metadata($source);
-    is $meta->tags->_scalar, 'TAGS';
+    is $meta->find('tags')->as_scalar, 'TAGS';
 }
 
 {
@@ -44,7 +45,7 @@ tags: TAGS
 bad: yaml
 -->);
     my $meta = $md->metadata($source);
-    is $meta->tags->_scalar, undef;
+    is $meta->find('tags')->as_scalar, undef;
 }
 
 done_testing;

@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use utf8;
 
 use Test::More;
 use Docs;
@@ -25,7 +26,7 @@ my $book = $books->find_uri('example');
     is $book->naming->title, 'Example';
 
     my @children = values %{$book->children('uri')};
-    is scalar @children, 3;
+    is scalar @children, 5;
 }
 
 my $en = $book->find_uri('en');
@@ -38,7 +39,7 @@ my $en = $book->find_uri('en');
     is $en->naming->title, 'English';
 
     my @children = values %{$en->children('uri')};
-    is scalar @children, 4;
+    is scalar @children, 5;
 }
 
 my $ja = $book->find_uri('ja');
@@ -52,6 +53,23 @@ my $ja = $book->find_uri('ja');
 }
 
 {
+    my $html = $en->find_uri(qw/formatters htmldoc/);
+    ok $html;
+    is $html->file_name, '01-HTMLDocument@htmldoc.html';
+    is $html->uri_name, 'htmldoc';
+    is $html->order, 1;
+    is $html->naming->title, 'HTMLDocument';
+    is $html->naming->extension, 'html';
+
+    my $ctx = $app->new_context(lang => 'en');
+    is $html->ctx_plain_lead($ctx), '';
+    is $html->ctx_body_without_lead($ctx), q{<h1>This Is A Raw HTML Document</h1>
+
+<p>If the file extension is .html, then the file will parsed as raw HTML document.</p>
+};
+}
+
+{
     my $md = $en->find_uri('formatters', 'mddoc');
     ok $md;
     is $md->file_name, '02-MarkdownDocument@mddoc.md';
@@ -59,54 +77,65 @@ my $ja = $book->find_uri('ja');
     is $md->order, 2;
     is $md->naming->title, 'MarkdownDocument';
     is $md->naming->extension, 'md';
+
+    my $ctx = $app->new_context(lang => 'en');
+    is $md->ctx_plain_lead($ctx), '';
+    is $md->ctx_body_without_lead($ctx), q{<h1>This Is A Markdown Document</h1>
+
+<p>If the file extension is .md, then the file will be parsed as Markdown document.</p>
+};
 }
 
 {
     my $folder = $en->find_uri(q/meta/);
     ok $folder;
 
-    is $folder->metadata->title->_scalar, 'Metadata Testing';
-    is $folder->metadata->_find('title.ja')->_scalar, 'メタデータテスト';
-    is $folder->metadata->_find('tags')->_scalar, 'meta,folder,test';
-    is $folder->metadata->_cascade_find('author')->_scalar, 'The Author';
+    is $folder->metadata->find('title')->as_scalar, 'Metadata Testing';
+    is $folder->metadata->find('title.ja')->as_scalar, 'メタデータテスト';
+    is $folder->metadata->find('tags')->as_scalar, 'meta,folder,test';
+    is $folder->metadata->cascade_find('author')->as_scalar, 'The Author';
 
-    my $ctx = Docs::Context->new(language => 'ja');
-    is $folder->metadata->_ctx_find($ctx, 'title')->_scalar, 'メタデータテスト';
-    is $folder->metadata->_ctx_cascade_find($ctx, 'author')->_scalar, '著者';
+    my $ctx = Docs::Context->new(lang => 'ja');
+    is $folder->metadata->ctx_find($ctx, 'title')->as_scalar, 'メタデータテスト';
+    is $folder->metadata->ctx_cascade_find($ctx, 'author')->as_scalar, '著者';
     is $folder->ctx_title($ctx), 'メタデータテスト';
     is $folder->ctx_author($ctx), '著者';
 
-    $ctx->language('en');
-    is $folder->metadata->_ctx_find($ctx, 'title')->_scalar, 'Metadata Testing';
-    is $folder->metadata->_ctx_cascade_find($ctx, 'author')->_scalar, 'The Author';
+    $ctx = Docs::Context->new(lang => 'en');
+    is $folder->metadata->ctx_find($ctx, 'title')->as_scalar, 'Metadata Testing';
+    is $folder->metadata->ctx_cascade_find($ctx, 'author')->as_scalar, 'The Author';
     is $folder->ctx_title($ctx), 'Metadata Testing';
     is $folder->ctx_author($ctx), 'The Author';
+
+    is $folder->ctx_lead($ctx), 'Lead of folder';
 }
 
 {
     my $doc = $en->find_uri(qw/meta docmeta/);
     ok $doc;
 
-    is $doc->metadata->title->_scalar, 'Document Has Meta';
-    is $doc->metadata->_find('title.ja')->_scalar, 'メタデータ付きドキュメント';
-    is $doc->metadata->_find('tags')->_scalar, 'meta,document,test';
-    is $doc->metadata->_cascade_find('author')->_scalar, 'The Author';
+    is $doc->metadata->find('title')->as_scalar, 'Document Has Meta';
+    is $doc->metadata->find('title.ja')->as_scalar, 'メタデータ付きドキュメント';
+    is $doc->metadata->find('tags')->as_scalar, 'meta,document,test';
+    is $doc->metadata->cascade_find('author')->as_scalar, 'The Author';
     is $doc->formatted_body, qq{<h1>Document Has Meta</h1>
 
 <p>HTML comment at document head means document meta data.</p>
 };
 
-    my $ctx = Docs::Context->new(language => 'ja');
-    is $doc->metadata->_ctx_find($ctx, 'title')->_scalar, 'メタデータ付きドキュメント';
-    is $doc->metadata->_ctx_cascade_find($ctx, 'author')->_scalar, '著者';
+    my $ctx = Docs::Context->new(lang => 'ja');
+    is $doc->metadata->ctx_find($ctx, 'title')->as_scalar, 'メタデータ付きドキュメント';
+    is $doc->metadata->ctx_cascade_find($ctx, 'author')->as_scalar, '著者';
     is $doc->ctx_title($ctx), 'メタデータ付きドキュメント';
     is $doc->ctx_author($ctx), '著者';
+    is $doc->ctx_lead($ctx), 'メタデータのリード文';
 
-    $ctx->language('en');
-    is $doc->metadata->_ctx_find($ctx, 'title')->_scalar, 'Document Has Meta';
-    is $doc->metadata->_ctx_cascade_find($ctx, 'author')->_scalar, 'The Author';
+    $ctx = new Docs::Context->new(lang => 'en');
+    is $doc->metadata->ctx_find($ctx, 'title')->as_scalar, 'Document Has Meta';
+    is $doc->metadata->ctx_cascade_find($ctx, 'author')->as_scalar, 'The Author';
     is $doc->ctx_title($ctx), 'Document Has Meta';
     is $doc->ctx_author($ctx), 'The Author';
+    is $doc->ctx_lead($ctx), 'Lead in meta';
 }
 
 {
@@ -139,7 +168,7 @@ my $ja = $book->find_uri('ja');
 
     my $tags;
 
-    my $ctx = Docs::Context->new(language => 'en');
+    my $ctx = Docs::Context->new(lang => 'en');
     is $folder->ctx_title($ctx), 'Multi Language Folder';
     is $folder->ctx_author($ctx), 'Folder Author';
 
@@ -163,7 +192,7 @@ my $ja = $book->find_uri('ja');
     is $tags->[0]->label, 'Tag0';
 
 
-    $ctx->language('ja');
+    $ctx = new Docs::Context->new(lang => 'ja');
     is $folder->ctx_title($ctx), '多言語フォルダ';
     is $folder->ctx_author($ctx), 'フォルダの著者';
     $tags = $folder->ctx_raw_tags($ctx);
@@ -183,6 +212,43 @@ my $ja = $book->find_uri('ja');
     $tags = $doc->ctx_tags($ctx);
     is $tags->[0]->group, 'ドキュメント';
     is $tags->[0]->label, 'Tag0';
+}
+
+{
+    my $node = $books->path_find('/example/en/formatters/mddoc');
+    is $node->ctx_author($ctx), 'Kunihiko Miyanaga <miyanaga@ideamans.com>';
+    is $node->ctx_author_name($ctx), 'Kunihiko Miyanaga';
+    is $node->ctx_author_email($ctx), 'miyanaga@ideamans.com';
+}
+
+{
+    my $node = $books->path_find('/example/seealso/doc');
+    ok $node;
+
+    my @seealso = $node->ctx_seealso($ctx);
+    is scalar @seealso, 2;
+    is $seealso[0]->uri_name, 'htmldoc';
+    is $seealso[1]->uri_name, 'first';
+}
+
+{
+    my $third = $books->path_find('/example/en/sibling/third');
+    ok $third;
+    my $ctx = $app->new_context(lang => 'en');
+
+    is $third->ctx_next($ctx)->uri_name, 'fourth';
+    is $third->ctx_next($ctx)->ctx_next($ctx), undef;
+    is $third->ctx_prev($ctx)->uri_name, 'first';
+    is $third->ctx_prev($ctx)->ctx_prev($ctx), undef;
+}
+
+{
+    my $third = $books->path_find('/example/en/sibling/third');
+    ok $third;
+    my $ctx = $app->new_context(lang => 'en');
+
+    is $third->ctx_number($ctx), '2.';
+    is $third->ctx_numbering($ctx), '1.5.2.';
 }
 
 done_testing;

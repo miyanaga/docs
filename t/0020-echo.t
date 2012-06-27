@@ -2,6 +2,7 @@ use Plack::Test;
 use Test::More;
 use HTTP::Request::Common;
 use Tatsumaki::Application;
+use utf8;
 
 use Docs;
 
@@ -13,6 +14,13 @@ test_psgi $app, sub {
     ok $res->is_success;
     is $res->code, 200;
     is $res->content, 'hello';
+
+    $res = $cb->(GET "http://localhost/~test/path_info");
+    is $res->code, 200;
+    is $res->content, '/~test/path_info';
+
+    # $res = $cb->(GET "http://localhost/example/en/formatters/htmldoc");
+    # diag $res->content;
 
     $res = $cb->(GET "http://localhost/~test/unknown");
     is $res->content, 'unknown test';

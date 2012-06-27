@@ -3,13 +3,23 @@ groonga:
     root: data/groonga
     node_columns_weight:
         title: 10
-        h1: 7
-        h2: 6
-        h3: 5
-        h4: 4
-        h5: 3
-        h6: 2
+        h1: 8
+        h2: 7
+        h3: 6
+        h4: 5
+        h5: 4
+        h6: 3
+        lead: 2
         text: 1
+handler_methods:
+    groonga.node.search:
+        package: Docs::Application::Handler::Node
+        method: search
+        code: Docs::Component::GroongaSearch::HandlerMethod::node_search
+    groonga.node.navigation_tags:
+        package: Docs::Application::Handler::Node
+        method: navigation_tags
+        code: Docs::Component::GroongaSearch::HandlerMethod::node_navigation_tags
 context_methods:
     groonga.book.path:
         package: Docs::Model::Node::Book
@@ -43,6 +53,10 @@ context_methods:
         package: Docs::Model::Node
         method: stash_title
         code: Docs::Component::GroongaSearch::ContextMethod::stash_title
+    node.stash_lead:
+        package: Docs::Model::Node
+        method: stash_lead
+        code: Docs::Component::GroongaSearch::ContextMethod::stash_lead
     node.stash_text:
         package: Docs::Model::Node
         method: stash_text
@@ -51,10 +65,10 @@ context_methods:
         package: Docs::Model::Node
         method: stash_headlines
         code: Docs::Component::GroongaSearch::ContextMethod::stash_headlines
-    node.search_node:
+    node.search:
         package: Docs::Model::Node
-        method: search_node
-        code: Docs::Component::GroongaSearch::ContextMethod::search_node
+        method: search
+        code: Docs::Component::GroongaSearch::ContextMethod::search
     node.navigation_recent:
         package: Docs::Model::Node
         method: navigation_recent

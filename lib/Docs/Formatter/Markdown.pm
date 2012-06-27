@@ -6,6 +6,7 @@ use parent 'Docs::Formatter';
 
 use Text::Markdown;
 use Any::Moose;
+use Encode;
 
 has markdown => ( is => 'ro', isa => 'Text::Markdown', lazy_build => 1, builder => sub {
     my $self = shift;

@@ -2,7 +2,8 @@ package Docs::Model::Node;
 
 use strict;
 use warnings;
-use parent 'Sweets::Tree::MultiPath::Node';
+use utf8;
+use parent qw(Sweets::Tree::MultiPath::Node Sweets::Aspect::Stashable::AnyEvent);
 $Sweets::Tree::MultiPath::Node::DEFAULT_NS = 'uri';
 
 use Any::Moose;
@@ -10,6 +11,7 @@ use Docs;
 use Docs::Model::Node::Metadata;
 use Docs::Model::Node::Naming;
 use Docs::Context;
+use File::Spec;
 
 has naming => ( is => 'ro', isa => 'Docs::Model::Node::Naming', lazy_build => 1, builder => sub {
     Docs::Model::Node::Naming->new
@@ -25,9 +27,6 @@ has books => ( is => 'ro', isa => 'Any', lazy_build => 1, builder => sub {
 has book => ( is => 'ro', isa => 'Any', lazy_build => 1, builder => sub {
     shift->parent_at(1) || 0;
 });
-has stash_store => ( is => 'ro', isa => 'HashRef', lazy_build => 1, builder => sub { {} } );
-
-sub is_folder { 0 };
 
 sub uri_name { shift->name('uri', @_) }
 sub file_name { shift->name('file', @_) }
@@ -38,9 +37,36 @@ sub file_path { shift->build_path('file', '/') }
 sub find_uri { shift->find('uri', @_) };
 sub find_file { shift->find('file', @_) };
 
+sub path_find {
+    my $self = shift;
+    my ( $path ) = @_;
+    return $self if !defined($path) || $path eq '';
+    if ( substr( $path, 0, 1 ) eq '/' ) {
+        $self->books->path_find( substr( $path, 1 ) );
+    } else {
+        $self->find_uri( grep { $_ } split '/', $path );
+    }
+}
+
+sub is_in_uri_path {
+    shift->is_in_path('uri', @_);
+}
+
 sub child_class { die 'Must be overridden' }
 
+sub is_document { eval { shift->isa('Docs::Model::Node::Document'); }; }
+sub is_folder { eval { shift->isa('Docs::Model::Node::Folder'); }; }
+sub is_book { eval { shift->isa('Docs::Model::Node::Book'); }; }
+sub is_books { eval { shift->isa('Docs::Model::Node::Books'); }; }
+sub is_index { shift->uri_name eq 'index'; }
+
+sub index_node {
+    shift->find_uri('index');
+}
+
 sub source { '' }
+
+sub formatted_body { '' }
 
 sub file_mtime {
     my $self = shift;
@@ -65,24 +91,37 @@ sub rebuild {
     my $app = Docs::app();
 
     $self->clear_metadata;
-    $self->clear_stash_store;
+    $self->clear_stashes;
 }
 
-sub stash {
+sub ctx_base_href {
     my $self = shift;
-    my ( $key, $value ) = @_;
-    my $stash = $self->stash_store;
-    return $stash unless defined $key;
-    $stash->{$key} = $value if defined($value);
-    $stash->{$key};
+    my $ctx = shift;
+
+    my @file_path = File::Spec->splitdir($self->file_path);
+    shift @file_path;
+    '/' . File::Spec->catdir(@file_path);
 }
 
 sub ctx_stash {
     my $self = shift;
     my $ctx = shift;
-    pop;
 
-    $ctx->stash( $self, @_ );
+    $ctx->object_stash( $self, @_ );
+}
+
+sub ctx_template {
+    my $self = shift;
+    my $ctx = shift;
+
+    $self->metadata->ctx_find($ctx, 'template')->as_scalar
+        || (
+        $self->is_books
+            ? 'books'
+            : $self->is_book
+                ? 'book'
+                : 'node'
+        );
 }
 
 sub ensure { return undef; }

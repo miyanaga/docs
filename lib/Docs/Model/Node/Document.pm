@@ -24,10 +24,10 @@ sub source {
     my $self = shift;
     my $path = $self->file_path;
 
-    my $source;
+    my $source = '';
     if ( -f $path ) {
-        open(my $fh, $path) || return;
-        $source = join '', <$fh>;
+        open(my $fh, '<:utf8', $path) || Carp::confess("failed to open $path");
+        $source = join('', <$fh>);
         close($fh);
     }
 
@@ -57,7 +57,9 @@ sub from_naming {
     my $pkg = shift;
     my ( $naming ) = @_;
 
-    return unless Docs->app->formatter($naming->extension);
+    my $app = Docs::app();
+
+    return undef unless $app->formatter($naming->extension);
     $pkg->SUPER::from_naming($naming);
 }
 
