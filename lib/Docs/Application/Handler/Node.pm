@@ -96,6 +96,15 @@ sub relations {
     $self->render('partial/node/relations', nodes => \@nodes );
 }
 
+sub rebuild {
+    my $self = shift;
+    my $app = Docs::app();
+
+    $app->rebuild_books();
+
+    $self->write('finished');
+}
+
 no Any::Moose;
 __PACKAGE__->meta->make_immutable;
 

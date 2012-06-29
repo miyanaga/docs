@@ -28,7 +28,7 @@
                         // Manually
                         e.preventDefault();
                         var $tab = $(this);
-                        $.cookie('_navigation', '#' + $tab.attr('id'), { expires: $.Docs.cookiesExpires(), path: '/' } );
+                        $.cookie('_navigation', '#' + $tab.attr('id'), { path: '/', expires: $.Docs.cookiesExpires(), path: '/' } );
                         $tab.tab('show');
                     });
 
@@ -118,4 +118,18 @@ jQuery(function() {
 
     $('div#node-relations').docsLoadRelations();
     $('body').docsSitemapOpener();
+
+    // TODO: Remove
+    $('#rebuilder').click(function(e) {
+        e.preventDefault();
+        $(this).find('span').text('Rebuilding...');
+        $.get(
+            '/',
+            { action: 'rebuild' },
+            function(data) {
+                location.reload();
+            }
+        );
+        return false;
+    });
 });

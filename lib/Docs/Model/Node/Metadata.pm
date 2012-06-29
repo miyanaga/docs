@@ -22,6 +22,7 @@ sub ctx_find {
 
     my $last = pop;
     $last = [ join('.', $last, $ctx->language->key), $last ] unless ref $last;
+
     $self->SUPER::find( @_, $last );
 }
 

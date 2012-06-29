@@ -7,14 +7,9 @@ use parent qw(Sweets::Aspect::Stashable::AnyEvent);
 use Any::Moose;
 
 has cookies_expires_days => ( is => 'rw', isa => 'Int', default => 365 );
-has cookieing => ( is => 'ro', isa => 'ArrayRef', default => sub { [qw/lang search_per_page navigation_tab/] } );
+has cookieing => ( is => 'ro', isa => 'ArrayRef', default => sub { [qw/lang search_per_page navigation/] } );
 has lang => ( is => 'rw', isa => 'Str', default => sub {
     Docs::app()->preferred_lang;
-});
-has language => ( is => 'rw', isa => 'Docs::Model::Language', lazy_build => 1, builder => sub {
-    my $self = shift;
-    my $app = Docs::app();
-    $app->language($self->lang) || $app->preferred_language;
 });
 has node => ( is => 'rw', isa => 'Docs::Model::Node', lazy_build => 1, builder => sub {
     Docs::app()->books;
@@ -27,16 +22,21 @@ has paths => ( is => 'rw', isa => 'ArrayRef', lazy_build => 1, builder => sub {
     [ grep { $_ } split '/', shift->path_info ];
 });
 has search_per_page => ( is => 'rw', isa => 'Int', default => 10 );
-has navigation_tab => ( is => 'rw', isa => 'Str', default => '' );
+has navigation => ( is => 'rw', isa => 'Str', default => '' );
 
 has app => ( is => 'rw', isa => 'Docs::Application', lazy_build => 1, builder => sub {
     Docs::app();
 });
 
+sub language {
+    my $self = shift;
+    my $app = Docs::app();
+    $app->language($self->lang) || $app->preferred_language;
+}
+
 sub cookies_expires_on {
     time + 60 * 60 * 24 * shift->cookies_expires_days
 }
-
 
 sub document {
     my $node = shift->node || return;

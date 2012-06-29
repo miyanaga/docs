@@ -87,7 +87,7 @@
             var lang = $switcher.attr('data-lang');
             $switcher.click(function(e) {
                 e.preventDefault();
-                $.cookie('_lang', lang, { expires: $.Docs.cookiesExpires() });
+                $.cookie('_lang', lang, { path: '/', expires: $.Docs.cookiesExpires() });
                 location.reload();
                 return false;
             });
@@ -101,7 +101,7 @@
             var per_page = $switcher.attr('data-per-page') || $switcher.val() || 10;
             $switcher.click(function(e) {
                 e.preventDefault();
-                $.cookie('_search_per_page', per_page, { expires: $.Docs.cookiesExpires() });
+                $.cookie('_search_per_page', per_page, { path: '/', expires: $.Docs.cookiesExpires() });
                 var $form = $switcher.parents('form');
                 $form.find('#docs-search-page, input[name=page]').val(0);
                 $form.get(0).submit();
@@ -126,6 +126,7 @@
             });
         });
     };
+
 })(jQuery);
 
 jQuery(function($) {
