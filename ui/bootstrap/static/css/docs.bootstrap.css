@@ -32,15 +32,15 @@
     text-overflow: ellipsis;
 }
 
-ul.nodes ul.nodes {
+ul.docs-nodes ul.docs-nodes {
     margin-left: 10px;
 }
 
-ui.nodes ui.nodes.nav {
+ui.docs-nodes ui.docs-nodes.nav {
     margin-bottom: 0px;
 }
 
-#node-footer .signature {
+#node-footer .docs-signature {
     text-align: right;
 }
 
@@ -110,37 +110,37 @@ body.docs-search-tag .docs-search-box {
     display: none;
 }
 
-article#node section h1,
-.node-list h1 {
+article#docs-node section h1,
+.docs-node-list h1 {
     font-size: 22px;
     margin-top: 24px;
     margin-bottom: 8px;
     border-bottom: 1px dashed #ccc;
 }
 
-article#node section h1:first-child {
+article#docs-node section h1:first-child {
     margin-top: 0px;
 }
 
-article#node section h2,
-.node-list h2 {
+article#docs-node section h2,
+.docs-node-list h2 {
     font-size: 18px;
     margin-top: 12px;
     margin-bottom: 4px;
 }
 
-article#node section h3 {
+article#docs-node section h3 {
     font-size: 14px;
     margin-top: 6px;
     margin-bottom: 2px;
 }
 
-article#node section h4 {
+article#docs-node section h4 {
     font-size: 14px;
     margin-top: 6px;
     margin-bottom: 2px;
 }
 
-article#node #node-footer #node-author-avatar img {
+article#docs-node #node-footer #node-author-avatar img {
     margin-left: 8px;
 }

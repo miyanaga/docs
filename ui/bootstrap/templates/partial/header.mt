@@ -19,6 +19,7 @@
       }
     </style>
     <link href="/static/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/static/css/prettify.css" rel="stylesheet">
     <link href="/static/css/docs.css" rel="stylesheet">
     <link href="/static/css/docs.bootstrap.css" rel="stylesheet">
 

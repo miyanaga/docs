@@ -53,14 +53,14 @@
 ? };
 
 ? block content => sub {
-    <article id="node" data-node-url="<?= $document->uri_path ?>">
-        <header id="node-header">
+    <article id="docs-node" data-node-url="<?= $document->uri_path ?>">
+        <header id="docs-node-header">
             <?= include 'partial/node/section_header', node => $document ?>
             <hr>
         </header>
 
         <? if ( my $body = $document->ctx_body($ctx) ) { ?>
-        <section id="node-body">
+        <section id="docs-node-body">
                 <?= raw($body); ?>
         </section>
         <? } ?>
@@ -75,10 +75,10 @@
             </section>
         <? } ?>
 
-        <footer id="node-footer">
+        <footer id="docs-node-footer">
             <hr>
-            <div id="node-footnote"></div>
-            <div id="node-relations" data-node="<?= $document->uri_path ?>"></div>
+            <div id="docs-node-footnote"></div>
+            <div id="docs-node-relations" data-node="<?= $document->uri_path ?>"></div>
 
             <?= include 'partial/node/section_footer', node => $document ?>
         </footer>

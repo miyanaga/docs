@@ -18,6 +18,7 @@
     <script src="/static/js/jquery.replace-text.js"></script>
     <script src="/static/js/docs.js"></script>
     <script src="/static/js/docs.bootstrap.js"></script>
+    <script src="/static/js/prettify.js"></script>
     <script>
       jQuery(function($) {
         $('.dropdown-toggle').dropdown();

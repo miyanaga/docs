@@ -150,7 +150,7 @@
                         q: keyword
                     },
                     function(data) {
-                        
+
                         // After/Complete
                         $this.find('#quick-search-result').find('li').remove();
                         $this.find('#quick-search-result').append($(data));
@@ -211,6 +211,13 @@ jQuery(function() {
             $(this).append($('<img class="avatar">').attr('src', url));
         }
     });
+
+    // Pretty print
+    if(window.prettyPrint) {
+        console.log('prityprint');
+        $('section#docs-node-body pre').addClass('prettyprint');
+        prettyPrint();
+    }
 
     // TODO: Remove
     $('#rebuilder').click(function(e) {

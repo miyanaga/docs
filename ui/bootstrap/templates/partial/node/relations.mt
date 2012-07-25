@@ -4,7 +4,7 @@
 
 <!-- node relation -->
 <? if ( @$nodes ) { ?>
-    <ul class="nodes nodes-relations nav nav-pills nav-stacked">
+    <ul class="docs-nodes docs-nodes-relations nav nav-pills nav-stacked">
     <? for my $node ( @$nodes ) { ?>
         <? if ( my $relation = $node->ctx_stash($ctx, 'relation') ) { ?>
             <li>
