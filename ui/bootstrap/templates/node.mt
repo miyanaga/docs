@@ -81,6 +81,7 @@
             <div id="docs-node-relations" data-node="<?= $document->uri_path ?>"></div>
 
             <?= include 'partial/node/section_footer', node => $document ?>
+            <?= raw($helper->facebook_comment_form) if $helper->can('facebook_comment_form') ?>
         </footer>
     </artible>
 

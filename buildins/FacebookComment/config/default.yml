@@ -1,0 +1,9 @@
+id: FacebookComment
+ui:
+    helper_methods:
+        facebook_comment.load:
+            method: facebook_comment_load
+            code: Docs::Component::FacebookComment::HelperMethod::comment_load
+        facebook_comment.form:
+            method: facebook_comment_form
+            code: Docs::Component::FacebookComment::HelperMethod::comment_form

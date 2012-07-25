@@ -6,7 +6,7 @@ use Test::More;
 use Docs;
 use Docs::UI::Helper;
 
-my $app = Docs::app();
+my $app = Docs::app;
 
 {
     my $ctx = $app->new_context(lang => 'en');
@@ -66,5 +66,42 @@ my $app = Docs::app();
 
 }
 
+{
+    my $node = $app->books->path_find('/example/en');
+    my $ctx = $app->new_context(lang => 'en', node => $node);
+
+    my $helper = Docs::UI::Helper->new(context => $ctx);
+
+    $app->config->raw({
+        facebook_comment => {
+            app_id => '0123456789',
+            posts => 2,
+        },
+    });
+
+    is $helper->facebook_comment_load, q|
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/ja_JP/all.js#xfbml=1&appId=0123456789";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+|;
+
+    is $helper->facebook_comment_form, q|
+<style>.fb_iframe_widget,.fb_iframe_widget * { max-width: 100% !important; }</style>
+<script>document.write('<div class="fb-comments" data-href="' + location.href + '" data-num-posts="2" data-width="1200"></div>');</script>
+|;
+
+    $app->config->raw({
+        facebook_comment => {
+            app_id => '',
+        },
+    });
+    is $helper->facebook_comment_load, '';
+    is $helper->facebook_comment_form, '';
+}
 
 done_testing;
