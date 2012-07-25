@@ -13,18 +13,30 @@ use Encode;
 
 $YAML::Syck::ImplicitUnicode = 1;
 
-has metadata => ( is => 'rw', isa => 'Docs::Model::Node::Metadata', lazy_build => 1, builder => sub {
+has empty_metadata => ( is => 'rw', isa => 'Docs::Model::Node::Metadata', lazy_build => 1, builder => sub {
     my $self = shift;
     my $metadata = Docs::Model::Node::Metadata->new;
-
-    my $meta_yml = File::Spec->catdir( $self->file_path, 'meta.yml' );
-    if ( -f $meta_yml ) {
-        $metadata->load_yaml($meta_yml);
-    }
 
     $metadata->node($self);
     $metadata;
 });
+
+has index_metadata => ( is => 'rw', isa => 'Docs::Model::Node::Metadata', lazy_build => 1, builder => sub {
+    my $self = shift;
+    if ( my $index = $self->index_node ) {
+        my $metadata = Docs::Model::Node::Metadata->new;
+        %$metadata = %{$index->metadata};
+        $metadata->node($self);
+        return $metadata;
+    }
+
+    $self->empty_metadata;
+});
+
+sub metadata {
+    my $self = shift;
+    $self->index_node? $self->index_metadata: $self->empty_metadata;
+}
 
 sub child_class {
     my $self = shift;

@@ -26,7 +26,7 @@ my $book = $books->find_uri('example');
     is $book->naming->title, 'Example';
 
     my @children = values %{$book->children('uri')};
-    is scalar @children, 5;
+    is scalar @children, 6;
 }
 
 my $en = $book->find_uri('en');

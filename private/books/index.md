@@ -1,0 +1,3 @@
+<!--
+    lead: Docs example books.
+-->

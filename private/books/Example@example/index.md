@@ -1,3 +1,4 @@
+<!--
 author: Kunihiko Miyanaga <miyanaga@ideamans.com>
 tag_group_classes:
     GROUP: label-info
@@ -10,3 +11,4 @@ glossary:
     HTML:
         desc: Hyper Text Markup Language
         desc.ja: ハイパーテキストマークアップ言語
+-->
