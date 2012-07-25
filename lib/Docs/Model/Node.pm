@@ -17,9 +17,7 @@ has naming => ( is => 'ro', isa => 'Docs::Model::Node::Naming', lazy_build => 1,
     Docs::Model::Node::Naming->new
 });
 has metadata => ( is => 'rw', isa => 'Docs::Model::Node::Metadata', lazy_build => 1, builder => sub {
-    my $self = shift;
-    my $metadata = Docs::Model::Node::Metadata->new( node => $self );
-    $metadata;
+    shift->new_metadata;
 });
 has books => ( is => 'ro', isa => 'Any', lazy_build => 1, builder => sub {
     shift->parent_at(0) || 0;
@@ -27,6 +25,17 @@ has books => ( is => 'ro', isa => 'Any', lazy_build => 1, builder => sub {
 has book => ( is => 'ro', isa => 'Any', lazy_build => 1, builder => sub {
     shift->parent_at(1) || 0;
 });
+
+sub new_metadata {
+    my $self = shift;
+    my ( $raw ) = @_;
+    $raw = {} unless defined $raw;
+
+    my $meta = Docs::Model::Node::Metadata->new( $raw );
+    $meta->node($self);
+
+    $meta;
+}
 
 sub uri_name { shift->name('uri', @_) }
 sub file_name { shift->name('file', @_) }

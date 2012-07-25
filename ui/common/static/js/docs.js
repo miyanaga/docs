@@ -127,6 +127,123 @@
         });
     };
 
+    // Replace text
+    $.fn.docsReplaceText = function( search, replace ) {
+        return this.each(function(){
+            var node = this.firstChild,
+                replacing,
+                replaced,
+                remove = [];
+            if ( node ) {
+                do {
+                    if ( node.nodeType === 3 ) {
+                        replacing = node.nodeValue;
+                        replaced = replacing.replace( search, replace );
+                        if ( replaced !== replacing ) {
+                            if ( /</.test( replaced ) ) {
+                                $(node).before( replaced );
+                                remove.push( node );
+                            } else {
+                                node.nodeValue = replaced;
+                            }
+                        }
+                    }
+                } while ( node = node.nextSibling );
+            }
+            remove.length && $(remove).remove();
+        });
+    };
+
+    // Glossary
+    $.fn.docsReplaceGrossaly = function(options) {
+        var defaults = {
+            target: '#node-body p,#node-body td',
+            replace: function(original, glossary) {
+                return original;
+            }
+            // complete: function(grossaly, used)
+        };
+        var opts = $.extend(defaults, options);
+
+        return this.each(function() {
+            var node = this;
+            var $node = $(this);
+            var url = $node.attr('data-node-url');
+            if (!url) return;
+
+            $.get($node.attr('data-node-url'), {
+                action: 'grossaly'
+            }, function(data) {
+                // RegExp
+                var keywords = [];
+                for ( var keyword in data ) {
+                    if ( typeof keyword == 'string' ) {
+                        keywords.push(keyword);
+                    }
+                }
+                var reg = new RegExp(keywords.join('|'), 'ig');
+
+                // Replace text
+                var unique = {},
+                    used = [],
+                    index = 1;
+
+                $node.find(opts.target).docsReplaceText(reg, function(match, p) {
+                    var k = match.toLowerCase();
+                    var g = data[k];
+                    if (!g) return k;
+
+                    // Make unique array
+                    if (!unique[k]) {
+                        g.index = index++;
+                        used.push(g);
+                        unique[k] = { index: index };
+                    }
+
+                    return opts.replace.call(node, match, g);
+                });
+
+                if(opts.complete && typeof opts.complete == 'function') {
+                    opts.complete.call(node, data, used);
+                }
+            });
+        });
+    };
+
+    // Gravator
+    $.fn.docsGravatar = function(options) {
+        var defaults = {
+            base: 'http://www.gravatar.com/avatar/',
+            s: 48,
+            d: '404',
+            // complete: function(img)
+        };
+        var opts = $.extend(defaults, options);
+
+        return this.each(function() {
+            var container = this;
+            if (!opts.complete) return;
+
+            var $this = $(this);
+            var serial = $this.attr('data-email-serial');
+            if (!serial) return;
+
+            var param = {};
+            for (var p in opts) {
+                if (typeof p == 'string' && p != 'base' && opts[p]) {
+                    param[p] = opts[p];
+                }
+            }
+
+            $.get(
+                opts.base + serial,
+                param
+            ).success(function() {
+                opts.complete.call(container, this.url);
+            });
+        });
+    };
+
 })(jQuery);
 
 jQuery(function($) {

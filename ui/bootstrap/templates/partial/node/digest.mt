@@ -2,9 +2,13 @@
 ? my $node = $args{node} || Carp::confess('required node');
 ? my $sitemap = $args{node};
 ? my $nolead = $args{nolead};
+? my $parent_title = $args{parent} && $node->parent? $node->parent->ctx_title($ctx): '';
 
 <div class="docs-node docs-node-digest">
     <h2>
+        <? if ($parent_title) { ?>
+            <small><?= $parent_title ?> &raquo; </small>
+        <? } ?>
         <?= raw($helper->link_to_node($node, %args)); ?>
         <? my @children = $node->ctx_children($ctx); ?>
         <? if ( $node->is_folder && scalar @children ) { ?>

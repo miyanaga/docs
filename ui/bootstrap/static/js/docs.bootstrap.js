@@ -110,6 +110,58 @@
             })
         });
     };
+
+    // Install quick search
+    $.fn.docsQuickSearcher = function(options) {
+        var defaults = {
+            textbox: '.keyword',
+            min_length: 2,
+            // cancel: function() {},
+            // before: function() {},
+            // after: function() {},
+        };
+        var opts = $.extend(options, defaults);
+
+        return this.each(function() {
+            var container = this;
+            var $this = $(this);
+            var url = $(this).attr('data-node-url');
+            if (!url) return;
+
+            $this.find(opts.textbox).bind('keyup', function(e) {
+                var $textbox = $(this);
+                var keyword = $textbox.val();
+                if ( keyword.length < opts.min_length ) {
+                    // Cancel
+                    console.log(container);
+                    $this.find('#quick-search-result').find('li').remove();
+                    $this.parents('.nav-collapse.in.collapse').css('height', 'auto');
+                    $this.removeClass('open');
+                    return;
+                }
+
+                // Before
+                $this.addClass('open');
+
+                $.get(
+                    url,
+                    {
+                        action: 'quicksearch',
+                        q: keyword
+                    },
+                    function(data) {
+                        
+                        // After/Complete
+                        $this.find('#quick-search-result').find('li').remove();
+                        $this.find('#quick-search-result').append($(data));
+                        console.log($this.parents('.nav-collapse.in.collapse'));
+                        $this.parents('.nav-collapse.in.collapse').css('height', 'auto');
+                    }
+                )
+            });
+        });
+
+    }
 })(jQuery);
 
 jQuery(function() {
@@ -118,6 +170,47 @@ jQuery(function() {
 
     $('div#node-relations').docsLoadRelations();
     $('body').docsSitemapOpener();
+
+    // Grossaly
+    $('article#node').docsReplaceGrossaly({
+        target: '#node-body p, #node-body td',
+        replace: function(original, grossaly) {
+            var $wrap = $('<p><u rel="tooltip"></u><sup></sup></p>');
+            $wrap.find('u').attr('title', grossaly.description).text(original);
+            $wrap.find('sup').text('*' + grossaly.index);
+            return $wrap.html();
+        },
+        complete: function(grossaly, used) {
+            var $node = $(this);
+            $node.find('#node-body').tooltip({
+                selector: 'u[rel=tooltip]'
+            });
+
+            if (used && used.length > 0) {
+                var $dl = $('<dl></dl>');
+                $.each(used, function(i, g) {
+                    var $dt = $('<dt><span></span> <u></u></dt>');
+                    $dt.find('span').text('*' + g.index);
+                    $dt.find('u').text(g.keyword);
+                    var $dd = $('<dd></dd>').text(g.description);
+
+                    $dl.append($dt).append($dd);
+                });
+
+                $node.find('#node-footnote').append($dl);
+            }
+        }
+    });
+
+    // Quick Search
+    $('#quick-search').docsQuickSearcher();
+
+    // Gravator
+    $('#node-footer #node-author-avatar').docsGravatar({
+        complete: function(url) {
+            $(this).append($('<img class="avatar">').attr('src', url));
+        }
+    });
 
     // TODO: Remove
     $('#rebuilder').click(function(e) {

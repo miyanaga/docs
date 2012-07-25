@@ -28,6 +28,8 @@ has app => ( is => 'rw', isa => 'Docs::Application', lazy_build => 1, builder =>
     Docs::app();
 });
 
+has is_admin => ( is => 'rw', isa => 'Bool', default => 0 );
+
 sub language {
     my $self = shift;
     my $app = Docs::app();

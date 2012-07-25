@@ -288,27 +288,25 @@ sub navigation_recent {
     my $req = Groonga::Console::Simple::Request::Select->new(
         args => {
             offset      => 0,
-            limit       => $limit || 20,
+            limit       => $limit || 10,
             table       => 'Node',
             filter      => qq('parents\@"$path"'),
-            output_columns => '_id,_key,_score,title,text,h1',
+            output_columns => '_id,_key,_score,title',
             sortby      => '-updated_on',
         }
     );
 
     my $res = $req->execute($groonga);
 
-    my @records = map {
-        my @path = grep { $_ } split '/', $_->{_key};
-        my $node = $books->find_uri(@path) || return;
+    my @records = grep { $_ } map {
+        my $path = $_->{_key};
+        my $node = $books->path_find($path) || return;
         $node->ctx_stash_title( $ctx, $_->{title} );
-        $node->ctx_stash_text( $ctx, $_->{text} );
-        $node->ctx_stash_headlines( $ctx, $_->{h1} );
 
         $node;
     } @{$res->hash_array};
 
-    \@records;
+    wantarray? @records: \@records;
 }
 
 sub navigation_tags {

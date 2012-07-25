@@ -13,10 +13,17 @@ sub link_to_node {
     my $ctx = $self->context;
     my $numbering = 1;
     $numbering = 0 if $args{nonumbering};
+    my $tags = $args{tags};
 
     $args{inner} = $numbering
-        ? join( ' ', $node->ctx_numbering($ctx) , $node->ctx_title($ctx) )
+        ? join( '', '<span class="docs-numbering">', $node->ctx_numbering($ctx), '</span> <span class="docs-node-name">' , $node->ctx_title($ctx), '</span>' )
         : $node->ctx_title($ctx);
+
+    if ($tags) {
+        for my $tag ( $node->ctx_tags($ctx) ) {
+            $args{inner} .= ' ' . $self->link_to_tag($tag, nolink => 1);
+        }
+    }
 
     delete $args{attr}->{href} if $args{attr};
     $args{raw_attr} ||= {};

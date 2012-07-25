@@ -36,6 +36,16 @@ sub ctx_cascade_find {
     $self->SUPER::cascade_find( @_, $last );
 }
 
+sub ctx_cascade_set {
+    my $self = shift;
+    my $ctx = shift;
+
+    my $last = pop;
+    $last = [ join('.', $last, $ctx->language->key), $last ] unless ref $last;
+
+    $self->SUPER::cascade_set( @_, $last );
+}
+
 no Any::Moose;
 __PACKAGE__->meta->make_immutable;
 

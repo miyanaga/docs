@@ -1,6 +1,10 @@
 ? my %args = @_;
 ? my $node = $args{node} || Carp::confess('required node');
 
+<? if ( my $author_email_serial = $node->ctx_author_email_serial($ctx) ) { ?>
+<div class="pull-right" id="node-author-avatar" data-email-serial="<?= $author_email_serial ?>"></div>
+<? } ?>
+
 <? if ( my $author = $node->ctx_author_name($ctx) ) { ?>
 <div class="signature node-author">
     <?= raw($helper->theme_icon('user')); ?>

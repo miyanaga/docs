@@ -53,10 +53,13 @@
               <? block global_primary_nav => sub {} ?>
             </ul>
             <ul class="nav pull-right">
-              <li><a href="#" id="rebuilder">
-                <i class="icon-refresh icon-white"></i>
-                <span>Rebuild</span></a>
-              </li>
+              <? block global_teritiary_nav => sub { ?>
+              <? } ?>
+                <li><a href="#" id="rebuilder">
+                  <i class="icon-refresh icon-white"></i>
+                  <span>Rebuild</span></a>
+                </li>
+
               <? block global_secondary_nav => sub {} ?>
             </ul>
           </div><!--/.nav-collapse -->

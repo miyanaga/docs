@@ -1,3 +1,10 @@
+<!--
+glossary:
+    Markdown:
+        desc: One of text writing style like Wiki, and compatible with HTML.
+        desc.ja: Wikiに似たテキスト記法のひとつで、HTMLとの互換性があります。
+-->
+
 Lead in md
 
 # This Is A Markdown Document

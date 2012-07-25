@@ -7,6 +7,7 @@ use DateTime;
 use Sweets::String qw(trim);
 use Docs::Model::Node::Tag;
 use Docs::Model::Node::Headline;
+use Digest::MD5 qw(md5_hex);
 
 sub url {
     my $node = shift;
@@ -114,9 +115,20 @@ sub author_email {
     $email = $node->ctx_author($ctx);
     if ( $email =~ /<([^>]+)>/s ) {
         $email = trim($1);
+    } else {
+        $email = '';
     }
 
     $node->ctx_stash($ctx, 'author_email', $email);
+}
+
+sub author_email_serial {
+    my $node = shift;
+    my $ctx = shift;
+
+    my $email = $node->ctx_author_email($ctx);
+    print STDERR "$email\n";
+    md5_hex($email);
 }
 
 sub lead {
@@ -272,8 +284,6 @@ sub _datetime_format {
     my $node = shift;
     my $ctx = shift;
     pop;
-    my ( $epoch ) = @_;
-    $epoch ||= time;
 
     $node->metadata->ctx_cascade_find($ctx, 'format', $format)->as_scalar || $format;
 }
@@ -291,8 +301,10 @@ sub format_epoch {
     my $ctx = shift;
     my $orig = pop;
     my ( $epoch, $format ) = @_;
+    $format = _datetime_format($format, $node, $ctx);
 
-    _format_datetime( $format, $node, $ctx, $epoch, $orig );
+    my $dt = DateTime->from_epoch( epoch => $epoch );
+    $dt->strftime($format);
 }
 
 sub copyright {
@@ -336,6 +348,32 @@ sub _sibling {
 
 sub next { _sibling('next_sibling', @_); }
 sub prev { _sibling('prev_sibling', @_); }
+
+sub glossary {
+    my $node = shift;
+    my $ctx = shift;
+    pop;
+
+    my $set = $node->ctx_stash($ctx, 'glossary_set');
+    unless ( $set ) {
+        $set = $node->metadata->cascade_set('glossary');
+        $node->ctx_stash($ctx, 'glossary_set', $set);
+    }
+
+    my $words = $set->merge_hashes->as_hash || {};
+    my $glossary = $node->new_metadata($words);
+
+    my %result = map {
+        my $keyword = $glossary->ctx_find($ctx, $_, 'keyword')->as_scalar || $_;
+        my $desc = $glossary->ctx_find($ctx, $_, 'desc')->as_scalar
+            || $glossary->ctx_find($ctx, $_, 'description')->as_scalar
+            || '';
+
+        ( lc($keyword) => { keyword => $keyword, description => $desc } );
+    } keys %$words;
+
+    return \%result;
+}
 
 1;
 __END__

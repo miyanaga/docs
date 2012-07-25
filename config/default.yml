@@ -8,6 +8,8 @@ languages:
 preferred_language: en
 ui:
     theme: bootstrap
+    bootstrap:
+        global_nav_limit: 3
     helper_methods:
         core.link_to_node:
             method: link_to_node
@@ -99,6 +101,10 @@ context_methods:
         package: Docs::Model::Node
         method: author_email
         code: Docs::ContextMethod::Node::author_email
+    core.node.author_email_serial:
+        package: Docs::Model::Node
+        method: author_email_serial
+        code: Docs::ContextMethod::Node::author_email_serial
     core.node.headlines:
         package: Docs::Model::Node
         method: headlines
@@ -123,6 +129,10 @@ context_methods:
         package: Docs::Model::Node
         method: datetime_format
         code: Docs::ContextMethod::Node::datetime_format
+    core.node.format_epoch:
+        package: Docs::Model::Node
+        method: format_epoch
+        code: Docs::ContextMethod::Node::format_epoch
     core.node.copyright:
         package: Docs::Model::Node
         method: copyright
@@ -139,4 +149,7 @@ context_methods:
         package: Docs::Model::Node
         method: prev
         code: Docs::ContextMethod::Node::prev
-
+    core.node.glossary:
+        package: Docs::Model::Node
+        method: glossary
+        code: Docs::ContextMethod::Node::glossary

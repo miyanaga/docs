@@ -45,7 +45,7 @@
         <?= include('partial/search/pager', result => $result, form => '#docs-search' ) ?>
 
         <? for my $node ( @{$result->data} ) { ?>
-            <?= include('partial/node/digest', node => $node, nonumbering => 1); ?>
+            <?= include('partial/node/digest', node => $node, nonumbering => 1, parent => 1 ); ?>
         <? } ?>
 
         <? if($result->count > 0) { ?>

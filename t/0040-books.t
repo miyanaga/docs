@@ -251,4 +251,76 @@ my $ja = $book->find_uri('ja');
     is $third->ctx_numbering($ctx), '1.5.2.';
 }
 
+{
+    my $book = $books->find_uri(qw/example/);
+    ok $book;
+    my $md = $book->find_uri(qw/en formatters mddoc/);
+    ok $md;
+
+    my $ctx;
+    my $glossary;
+
+    $ctx = $app->new_context(lang => 'en');
+    $glossary = $book->ctx_glossary($ctx);
+
+    is_deeply $glossary, {
+        extension => {
+            keyword => 'extension',
+            description => 'The last part of filename describes file type.',
+        },
+        html => {
+            keyword => 'HTML',
+            description => 'Hyper Text Markup Language',
+        },
+    };
+
+    $glossary = $md->ctx_glossary($ctx);
+
+    is_deeply $glossary, {
+        extension => {
+            keyword => 'extension',
+            description => 'The last part of filename describes file type.',
+        },
+        html => {
+            keyword => 'HTML',
+            description => 'Hyper Text Markup Language',
+        },
+        markdown => {
+            keyword => 'Markdown',
+            description => 'One of text writing style like Wiki, and compatible with HTML.',
+        },
+    };
+
+    $ctx = $app->new_context(lang => 'ja');
+    $glossary = $book->ctx_glossary($ctx);
+
+    is_deeply $glossary, {
+        '拡張子' => {
+            keyword => '拡張子',
+            description => 'ファイル名の最後の部分でファイルのタイプを示します。',
+        },
+        html => {
+            keyword => 'HTML',
+            description => 'ハイパーテキストマークアップ言語',
+        },
+    };
+
+    $glossary = $md->ctx_glossary($ctx);
+
+    is_deeply $glossary, {
+        '拡張子' => {
+            keyword => '拡張子',
+            description => 'ファイル名の最後の部分でファイルのタイプを示します。',
+        },
+        html => {
+            keyword => 'HTML',
+            description => 'ハイパーテキストマークアップ言語',
+        },
+        markdown => {
+            keyword => 'Markdown',
+            description => 'Wikiに似たテキスト記法のひとつで、HTMLとの互換性があります。',
+        },
+    };
+}
+
 done_testing;

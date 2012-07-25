@@ -21,6 +21,21 @@ sub node_search {
     $self->render('search', q => $q, result => $result);
 }
 
+sub node_quicksearch {
+    my $self = shift;
+
+    my $ctx = $self->context;
+    my $node = $ctx->folder;
+
+    my $q = $self->request->parameters->get('q') || '';
+    $q = Encode::decode_utf8($q) unless utf8::is_utf8($q);
+    my $limit = int($self->request->parameters->get('limit') || 0) || 10;
+
+    my $result = $node->ctx_search($ctx, $q, 0, $limit);
+
+    $self->render('partial/node/quicksearch', q => $q, result => $result);
+}
+
 sub node_navigation_tags {
     my $self = shift; # node handler
     pop; # original
@@ -46,6 +61,40 @@ sub node_navigation_tags {
     }
 
     $self->render('partial/node/tagcloud', tags => \@tags);
+}
+
+sub node_navigation_recent {
+    my $self = shift; # node handler
+    pop; # original
+
+    my $limit = int($self->request->parameters->get('limit') || 0) || 20;
+    my $active = $self->request->parameters->get('active') || '';
+    my $ctx = $self->context;
+    my $node = $ctx->folder;
+    my @nodes = $node->ctx_navigation_recent($ctx, $limit);
+
+
+    # Grouping by date
+    my %datetimes;
+    my %nodes;
+    for my $node (@nodes) {
+        my $updated_on = $node->ctx_updated_on($ctx);
+        my $date = $node->ctx_format_epoch($ctx, $updated_on, 'date') || '';
+        $datetimes{$date} ||= $updated_on;
+        $nodes{$date} ||= [];
+        push @{$nodes{$date}}, $node;
+    }
+
+    my @groups = map {
+        {
+            date => $_,
+            nodes => $nodes{$_},
+        }
+    } sort {
+        $datetimes{$b} <=> $datetimes{$a}
+    } keys %nodes;
+
+    $self->render('partial/node/recent', groups => \@groups, active => $active);
 }
 
 1;
