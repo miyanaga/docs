@@ -1,14 +1,14 @@
 <!--
 tags: mixed, document, lang:en, lang:ja, type:infolder, 言語:日本語, タイプ:フォルダ内
 -->
-<lang:en>
+<docs:lang en>
 # In Folder
 
 This document is in folder.
-</lang:en>
+</docs:lang>
 
-<lang:ja>
+<docs:lang ja>
 # フォルダ内
 
 このドキュメントはフォルダ内にあります。
-</lang:ja>
+</docs:lang>

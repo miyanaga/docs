@@ -187,7 +187,7 @@ sub body {
     my $source = $node->source || return '';
 
     # Language filter.
-    $source =~ s|<lang:([a-z]+)>\s*(.*?)\s*</lang:\1>|{$1 eq $ctx->language->key? $2: ''}|iges;
+    $source =~ s|<docs:lang ([a-z]+)>\s*(.*?)\s*</docs:lang>|{$1 eq $ctx->language->key? $2: ''}|iges;
 
     $body = $node->formatter->format($source);
 

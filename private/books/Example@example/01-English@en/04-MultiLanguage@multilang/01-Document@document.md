@@ -6,13 +6,13 @@ author.ja: ドキュメントの著者
 tags: Document:Tag0, Document:Tag1
 tags.ja: ドキュメント:Tag0, ドキュメント:Tag1
 -->
-<lang:en>
+<docs:lang en>
 # Headline
 
 Content
-</lang:en>
-<lang:ja>
+</docs:lang>
+<docs:lang ja>
 # 見出し
 
 内容
-</lang:ja>
+</docs:lang>

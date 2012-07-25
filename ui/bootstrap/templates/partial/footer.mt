@@ -25,5 +25,6 @@
       });
     </script>
     <? block html_foot => sub {} ?>
+    <?= include 'partial/tracker' ?>
   </body>
 </html>
