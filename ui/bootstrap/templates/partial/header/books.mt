@@ -9,7 +9,7 @@
         <?= $book->ctx_title($ctx) ?>
         <b class="caret"></b>
     </a>
-    <ul id="books-pulldown" class="dropdown-menu">
+    <ul id="docs-books-pulldown" class="dropdown-menu">
         <? for my $b ( @$book_nodes ) { ?>
         <li>
             <a href="<?= $b->uri_path ?>" class="book-switcher">

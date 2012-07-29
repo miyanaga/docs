@@ -28,6 +28,11 @@ sub comment_load {
   js.src = "//connect.facebook.net/ja_JP/all.js#xfbml=1&appId=$app_id";
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
+<style>
+    .facebook-comment { margin-top: 16px; }
+    .fb_iframe_widget,.fb_iframe_widget * { max-width: 100% !important; }
+    \@media print { .facebook-comment { display: none !important } }
+</style>
 |;
 }
 
@@ -42,8 +47,9 @@ sub comment_form {
     my $node_path = $node->uri_path;
 
     return qq|
-<style>.fb_iframe_widget,.fb_iframe_widget * { max-width: 100% !important; }</style>
-<script>document.write('<div class="fb-comments" data-href="' + location.href + '" data-num-posts="$posts" data-width="1200"></div>');</script>
+<div class="facebook-comment">
+<script>document.write('<div class="fb-comments" data-href="' + location.href + '" data-num-posts="$posts" data-width="9999"></div>');</script>
+</div>
 |;
 }
 

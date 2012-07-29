@@ -2,29 +2,37 @@
     float: left;
 }
 
-#quick-search .dropdown-menu {
+.nav-collapse.in.collapse .docs-nav-more a.dropdown-toggle {
+    display: none;
+}
+
+.nav-collapse.in.collapse .docs-nav-more .dropdown-menu {
+    margin-left: 0px;
+}
+
+#docs-quick-search .dropdown-menu {
     min-width: 280px;
     max-width: 100%;
     height: auto;
 }
 
-#quick-search .dropdown-menu li a {
+#docs-quick-search .dropdown-menu li a {
     padding-top: 6px;
     padding-bottom: 6px;
     border-bottom: 1px dashed #CCC;
 }
 
-#quick-search .dropdown-menu li:last-child a {
+#docs-quick-search .dropdown-menu li:last-child a {
     border-bottom: none;
 }
 
-#quick-search .dropdown-menu li a h4 {
+#docs-quick-search .dropdown-menu li a h4 {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-#quick-search .dropdown-menu li a h4 small {
+#docs-quick-search .dropdown-menu li a h4 small {
     display: inline-block;
     max-width: 25%;
     white-space: nowrap;
@@ -40,7 +48,7 @@ ui.docs-nodes ui.docs-nodes.nav {
     margin-bottom: 0px;
 }
 
-#docs-node-footer .docs-signature {
+.docs-node-footer .docs-signature {
     text-align: right;
 }
 
@@ -110,7 +118,11 @@ body.docs-search-tag .docs-search-box {
     display: none;
 }
 
-article#docs-node section h1,
+#navigation-tags .docs-tag-cloud {
+    margin-bottom: 16px;
+}
+
+article.docs-node section h1,
 .docs-node-list h1 {
     font-size: 22px;
     margin-top: 24px;
@@ -118,29 +130,47 @@ article#docs-node section h1,
     border-bottom: 1px dashed #ccc;
 }
 
-article#docs-node section h1:first-child {
+article.docs-node section h1:first-child {
     margin-top: 0px;
 }
 
-article#docs-node section h2,
+article.docs-node section h2,
 .docs-node-list h2 {
     font-size: 18px;
     margin-top: 12px;
     margin-bottom: 4px;
 }
 
-article#docs-node section h3 {
+article.docs-node section h3 {
     font-size: 14px;
     margin-top: 6px;
     margin-bottom: 2px;
 }
 
-article#docs-node section h4 {
+article.docs-node section h4 {
     font-size: 14px;
     margin-top: 6px;
     margin-bottom: 2px;
 }
 
-article#docs-node #node-footer #node-author-avatar img {
+article.docs-node .docs-node-footer .docs-node-author-avatar img {
     margin-left: 8px;
+}
+
+
+@media screen {
+    .docs-breadcrumb
+    {
+        display: none !important;
+    }
+}
+
+@media print {
+    #global-nav,
+    #sidebar,
+    .docs-nodes-relations,
+    .docs-sitemap
+    {
+        display: none !important;
+    }
 }

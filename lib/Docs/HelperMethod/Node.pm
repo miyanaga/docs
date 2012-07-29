@@ -16,7 +16,7 @@ sub link_to_node {
     my $tags = $args{tags};
 
     $args{inner} = $numbering
-        ? join( '', '<span class="docs-numbering">', $node->ctx_numbering($ctx), '</span> <span class="docs-node-name">' , $node->ctx_title($ctx), '</span>' )
+        ? join( '', '<span class="docs-numbering">', $node->ctx_numbering($ctx), '</span> <span class="docs-node-title">' , $node->ctx_title($ctx), '</span>' )
         : $node->ctx_title($ctx);
 
     if ($tags) {

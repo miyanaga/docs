@@ -12,9 +12,6 @@ has node => ( is => 'ro', isa => 'Docs::Model::Node', lazy_build => 1, builder =
     my $ctx = $self->context;
     my $app = Docs::app();
 
-    use Data::Dumper;
-    print STDERR Dumper($self->request);
-
     my $node = $app->books->path_find($self->request->path_info || '');
     $node || Tatsumaki::Error::HTTP->throw(404, 'Not Found');
 
@@ -110,8 +107,9 @@ sub grossaly {
 
 sub rebuild {
     my $self = shift;
-    my $app = Docs::app();
+    Tatsumaki::Error::HTTP->throw(403) unless $self->context->is_admin;
 
+    my $app = Docs::app();
     $app->rebuild_books();
 
     $self->write('finished');

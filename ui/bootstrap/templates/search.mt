@@ -12,7 +12,7 @@
         no search results
     <? } else { ?>
         <div class="docs-search-form">
-        <form id="docs-search" method="GET" action="<?= $folder->uri_path ?>">
+        <form class="docs-search" method="GET" action="<?= $folder->uri_path ?>">
             <input type="hidden" name="action" value="search">
             <input type="hidden" name="page" value="<?= $result->page ?>">
 

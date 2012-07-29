@@ -1,16 +1,16 @@
 package Docs;
 
-use 5.012004;
 use strict;
 use warnings;
 
 our $NAME = 'Docs';
-our $VERSION = '0.50';
+our $VERSION = '0.55';
 our $APP_CLASS = 'Docs::Application';
 
 use Docs::Application;
 
 sub app {
+    shift if eval { $_[0] && $_[0] eq 'Docs' };
     $APP_CLASS->instance(@_);
 }
 

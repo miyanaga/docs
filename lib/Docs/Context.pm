@@ -5,6 +5,7 @@ use warnings;
 use parent qw(Sweets::Aspect::Stashable::AnyEvent);
 
 use Any::Moose;
+use NetAddr::IP;
 
 has cookies_expires_days => ( is => 'rw', isa => 'Int', default => 365 );
 has cookieing => ( is => 'ro', isa => 'ArrayRef', default => sub { [qw/lang search_per_page navigation/] } );
@@ -28,7 +29,28 @@ has app => ( is => 'rw', isa => 'Docs::Application', lazy_build => 1, builder =>
     Docs::app();
 });
 
-has is_admin => ( is => 'rw', isa => 'Bool', default => 0 );
+has is_admin => ( is => 'rw', isa => 'Bool', lazy => 1, default => sub {
+    my $self = shift;
+    my $app = Docs->app;
+    my @subnets = $app->config->cascade_find(qw/admin subnet/)->as_array;
+    return 1 unless @subnets;
+
+    my @match_headers = $app->config->cascade_find(qw/admin match_header/)->as_array;
+    push @match_headers, 'REMOTE_ADDR' unless @match_headers;
+
+    for my $header ( @match_headers ) {
+        my $value = $self->handler->request->env->{$header}
+            || next;
+        print STDERR $value;
+        my $remote = NetAddr::IP->new($value);
+        for my $subnet ( @subnets ) {
+            $subnet = NetAddr::IP->new($subnet);
+            return 1 if $subnet->contains($remote);
+        }
+    }
+
+    0;
+});
 
 sub language {
     my $self = shift;

@@ -28,3 +28,14 @@
     display: inline-block;
 }
 
+@media screen {
+    .print {
+        display: none !important;
+    }
+}
+
+@media print {
+    .noprint {
+        display: none !important;
+    }
+}

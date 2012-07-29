@@ -59,7 +59,6 @@
         return this.each(function() {
             var $el = $(this);
             $el.click(function(e) {
-                console.log($el);
                 e.preventDefault();
                 if ( $el.hasClass(opts.closed_class) ) {
                     $el
@@ -116,7 +115,6 @@
             var $switcher = $(this);
             var page = $switcher.attr('data-page') || $switcher.val() || 10;
             var form = $switcher.attr('data-form');
-            console.log('install');
             $switcher.click(function(e) {
                 e.preventDefault();
                 var $form = $(form);
@@ -157,7 +155,7 @@
     // Glossary
     $.fn.docsReplaceGrossaly = function(options) {
         var defaults = {
-            target: '#node-body p,#node-body td',
+            target: '.docs-node-body p,.docs-node-body td',
             replace: function(original, glossary) {
                 return original;
             }

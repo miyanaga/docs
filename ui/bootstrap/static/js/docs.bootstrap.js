@@ -100,7 +100,6 @@
 
                     $.get(url, { action: 'sitemap' }, function(data) {
                         var $append_to = $opener.parents(opts.container).first().find(opts.append_to);
-                        console.log($append_to);
                         $append_to.append($(data));
                         $opener.remove();
                     }).complete(function() { $loading.remove(); });
@@ -133,8 +132,7 @@
                 var keyword = $textbox.val();
                 if ( keyword.length < opts.min_length ) {
                     // Cancel
-                    console.log(container);
-                    $this.find('#quick-search-result').find('li').remove();
+                    $this.find('#docs-quick-search-result').find('li').remove();
                     $this.parents('.nav-collapse.in.collapse').css('height', 'auto');
                     $this.removeClass('open');
                     return;
@@ -152,9 +150,8 @@
                     function(data) {
 
                         // After/Complete
-                        $this.find('#quick-search-result').find('li').remove();
-                        $this.find('#quick-search-result').append($(data));
-                        console.log($this.parents('.nav-collapse.in.collapse'));
+                        $this.find('#docs-quick-search-result').find('li').remove();
+                        $this.find('#docs-quick-search-result').append($(data));
                         $this.parents('.nav-collapse.in.collapse').css('height', 'auto');
                     }
                 )
@@ -168,12 +165,12 @@ jQuery(function() {
     // Tabbing
     $('.tabbing').docsTabbing();
 
-    $('div#node-relations').docsLoadRelations();
+    $('div.docs-node-relations').docsLoadRelations();
     $('body').docsSitemapOpener();
 
     // Grossaly
-    $('article#node').docsReplaceGrossaly({
-        target: '#node-body p, #node-body td',
+    $('article.docs-node').docsReplaceGrossaly({
+        target: '.docs-node-body p, .docs-node-body td',
         replace: function(original, grossaly) {
             var $wrap = $('<p><u rel="tooltip"></u><sup></sup></p>');
             $wrap.find('u').attr('title', grossaly.description).text(original);
@@ -182,7 +179,7 @@ jQuery(function() {
         },
         complete: function(grossaly, used) {
             var $node = $(this);
-            $node.find('#node-body').tooltip({
+            $node.find('.docs-node-body').tooltip({
                 selector: 'u[rel=tooltip]'
             });
 
@@ -197,16 +194,16 @@ jQuery(function() {
                     $dl.append($dt).append($dd);
                 });
 
-                $node.find('#node-footnote').append($dl);
+                $node.find('.docs-node-footnote').append($dl);
             }
         }
     });
 
     // Quick Search
-    $('#quick-search').docsQuickSearcher();
+    $('#docs-quick-search').docsQuickSearcher();
 
     // Gravator
-    $('#node-footer #node-author-avatar').docsGravatar({
+    $('.docs-node-footer .docs-node-author-avatar').docsGravatar({
         complete: function(url) {
             $(this).append($('<img class="avatar">').attr('src', url));
         }
@@ -214,13 +211,12 @@ jQuery(function() {
 
     // Pretty print
     if(window.prettyPrint) {
-        console.log('prityprint');
-        $('section#docs-node-body pre').addClass('prettyprint');
+        $('section.docs-node-body pre').addClass('prettyprint');
         prettyPrint();
     }
 
     // TODO: Remove
-    $('#rebuilder').click(function(e) {
+    $('#docs-rebuilder').click(function(e) {
         e.preventDefault();
         $(this).find('span').text('Rebuilding...');
         $.get(
