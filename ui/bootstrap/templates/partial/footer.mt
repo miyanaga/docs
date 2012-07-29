@@ -5,6 +5,7 @@
         <? block footer => sub { ?>
           &copy;<?= raw($ctx->document->ctx_copyright($ctx)); ?>
         <? } ?>
+        Powered by <a href="https://github.com/miyanaga/docs">docs</a>
       </footer>
 
     </div><!--/.fluid-container-->

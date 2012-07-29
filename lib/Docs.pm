@@ -1,5 +1,6 @@
 package Docs;
 
+use 5.012004;
 use strict;
 use warnings;
 
