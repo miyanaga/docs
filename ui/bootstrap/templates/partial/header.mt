@@ -37,7 +37,6 @@
   </head>
 
   <body class="<? block body_class => sub { } ?>">
-    <?= include 'partial/body_header' ?>
     <?= raw($helper->facebook_comment_load) if $helper->can('facebook_comment_load') ?>
 
     <div id="global-nav" class="navbar navbar-fixed-top">
@@ -58,7 +57,7 @@
             <ul class="nav pull-right">
               <? block global_teritiary_nav => sub { ?>
               <? } ?>
-                <li><a href="#" id="docs-rebuilder">
+                <li><a href="#" class="docs-rebuilder">
                   <i class="icon-refresh icon-white"></i>
                   <span>Rebuild</span></a>
                 </li>

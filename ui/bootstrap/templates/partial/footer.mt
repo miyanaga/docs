@@ -26,7 +26,6 @@
       });
     </script>
     <? block html_foot => sub {} ?>
-    <?= include 'partial/body_footer' ?>
     <?= include 'partial/tracker' ?>
   </body>
 </html>

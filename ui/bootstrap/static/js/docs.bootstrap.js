@@ -132,7 +132,7 @@
                 var keyword = $textbox.val();
                 if ( keyword.length < opts.min_length ) {
                     // Cancel
-                    $this.find('#docs-quick-search-result').find('li').remove();
+                    $this.find('.docs-quick-search-result').find('li').remove();
                     $this.parents('.nav-collapse.in.collapse').css('height', 'auto');
                     $this.removeClass('open');
                     return;
@@ -150,8 +150,8 @@
                     function(data) {
 
                         // After/Complete
-                        $this.find('#docs-quick-search-result').find('li').remove();
-                        $this.find('#docs-quick-search-result').append($(data));
+                        $this.find('.docs-quick-search-result').find('li').remove();
+                        $this.find('.docs-quick-search-result').append($(data));
                         $this.parents('.nav-collapse.in.collapse').css('height', 'auto');
                     }
                 )
@@ -200,7 +200,7 @@ jQuery(function() {
     });
 
     // Quick Search
-    $('#docs-quick-search').docsQuickSearcher();
+    $('.docs-quick-search').docsQuickSearcher();
 
     // Gravator
     $('.docs-node-footer .docs-node-author-avatar').docsGravatar({
@@ -216,7 +216,7 @@ jQuery(function() {
     }
 
     // TODO: Remove
-    $('#docs-rebuilder').click(function(e) {
+    $('.docs-rebuilder').click(function(e) {
         e.preventDefault();
         $(this).find('span').text('Rebuilding...');
         $.get(
