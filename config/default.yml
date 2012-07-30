@@ -24,6 +24,23 @@ ui:
         core.format_datetime:
             method: format_datetime
             code: Docs::HelperMethod::Common::format_datetime
+macro_methods:
+    core.node:
+        tag: node
+        type: function
+        code: Docs::MacroMethod::Node::node
+    core.tag:
+        tag: tag
+        type: function
+        code: Docs::MacroMethod::Node::tag
+    core.lang:
+        tag: lang
+        type: block
+        code: Docs::MacroMethod::Common::lang
+    core.table:
+        tag: table
+        type: block
+        code: Docs::MacroMethod::Common::table
 formatters:
     html:
         label: Plain HTML

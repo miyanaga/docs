@@ -2,7 +2,7 @@ package Docs::UI::Helper;
 
 use strict;
 use warnings;
-use parent qw(Sweets::Helper::HTML Sweets::Aspect::Stashable::AnyEvent);
+use parent qw(Sweets::Helper::HTML Sweets::Aspect::Stashable);
 
 use Any::Moose;
 use Text::MicroTemplate::Extended;

@@ -36,6 +36,7 @@ has callbacks => ( is => 'ro', isa => 'Sweets::Callback::Engine', lazy_build => 
     }
     $engine;
 });
+has macros => ( is => 'ro', isa => 'HashRef', default => sub { {} } );
 has formatters => ( is => 'ro', isa => 'HashRef', default => sub { {} } );
 has books => ( is => 'rw', isa => 'Docs::Model::Node::Books', lazy_build => 1, builder => sub {
     shift->rebuild_books
@@ -160,6 +161,19 @@ sub init {
                 code => $tuple->{code}
             );
             $code->bind( 'Docs::UI::Helper', $tuple->{method} );
+        }
+    }
+
+    # Gather macro methods.
+    {
+        my $methods = $self->config->cascade_set(qw/macro_methods/)->merge_hashes->as_hash || {};
+        while ( my ( $key, $tupple ) = each %$methods ) {
+            my $tag = $tupple->{tag} || $key;
+            my $type = $tupple->{type} || 'function';
+            $type = 'function' if $type ne 'block';
+            my $code = Sweets::Code->new( code => $tupple->{code} )->ref;
+            $self->macros->{$type} ||= {};
+            $self->macros->{$type}->{$tag} = $code;
         }
     }
 

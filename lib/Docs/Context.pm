@@ -2,10 +2,12 @@ package Docs::Context;
 
 use strict;
 use warnings;
-use parent qw(Sweets::Aspect::Stashable::AnyEvent);
+use parent qw(Sweets::Aspect::Stashable);
 
 use Any::Moose;
 use NetAddr::IP;
+use Docs::UI::Helper;
+use Docs::Model::Node::Macro;
 
 has cookies_expires_days => ( is => 'rw', isa => 'Int', default => 365 );
 has cookieing => ( is => 'ro', isa => 'ArrayRef', default => sub { [qw/lang search_per_page navigation/] } );
@@ -126,6 +128,26 @@ sub to_cookies {
             expires => $self->cookies_expires_on,
         };
     }
+}
+
+sub new_helper {
+    my $self = shift;
+    my %args = @_;
+
+    Docs::UI::Helper->new(
+        context => $self,
+        %args
+    );
+}
+
+sub new_macro {
+    my $self = shift;
+    my %args = @_;
+
+    Docs::Model::Node::Macro->new(
+        context => $self,
+        %args
+    );
 }
 
 no Any::Moose;

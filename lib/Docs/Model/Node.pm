@@ -3,7 +3,7 @@ package Docs::Model::Node;
 use strict;
 use warnings;
 use utf8;
-use parent qw(Sweets::Tree::MultiPath::Node Sweets::Aspect::Stashable::AnyEvent);
+use parent qw(Sweets::Tree::MultiPath::Node Sweets::Aspect::Stashable);
 $Sweets::Tree::MultiPath::Node::DEFAULT_NS = 'uri';
 
 use Any::Moose;

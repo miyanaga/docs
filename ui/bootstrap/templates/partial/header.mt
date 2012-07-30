@@ -37,6 +37,7 @@
   </head>
 
   <body class="<? block body_class => sub { } ?>">
+    <?= include 'partial/body_header' ?>
     <?= raw($helper->facebook_comment_load) if $helper->can('facebook_comment_load') ?>
 
     <div id="global-nav" class="navbar navbar-fixed-top">

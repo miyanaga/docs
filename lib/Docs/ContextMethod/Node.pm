@@ -188,6 +188,9 @@ sub body {
 
     # Language filter.
     $source =~ s|<docs:lang ([a-z]+)>\s*(.*?)\s*</docs:lang>|{$1 eq $ctx->language->key? $2: ''}|iges;
+    
+    #my $macro = $ctx->new_macro( template => $source );
+    #$body = $macro->render || $source;
 
     $body = $node->formatter->format($source);
 
