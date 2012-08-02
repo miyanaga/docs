@@ -5,7 +5,7 @@ use utf8;
 use Test::More;
 use Docs;
 
-my $app = Docs::app;
+my $app = Docs::app(books_path => 't/books');
 
 {
     my $default = $app->formatter('html');

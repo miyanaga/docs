@@ -69,9 +69,10 @@
             <hr>
         </header>
 
-        <? if ( my $body = $document->ctx_body($ctx) ) { ?>
+        <? if ( my $body = $document->ctx_html($ctx) ) { ?>
         <section class="docs-node-body">
-                <?= raw($body); ?>
+            <ul class="well docs-headline-shortcuts pull-right nav nav-stacked nav-pills"></ul>
+            <?= raw($body); ?>
         </section>
         <? } ?>
 

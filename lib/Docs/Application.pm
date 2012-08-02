@@ -18,6 +18,9 @@ use Docs::UI;
 use Docs::Model::Language;
 
 has app_path => ( is => 'ro', isa => 'Str', required => 1 );
+has books_path => ( is => 'ro', isa => 'Str', lazy => 1, default => sub {
+    shift->config->cascade_find('books', 'root')->as_scalar || 'private/books'
+});
 has components => ( is => 'ro', isa => 'Sweets::Application::Components', lazy_build => 1, builder => sub {
     my $self = shift;
     my $components = Sweets::Application::Components->new;
@@ -78,7 +81,7 @@ sub rebuild_books {
 
     $books->naming->title('Docs');
     $books->uri_name( '' );
-    $books->file_name( $self->config->cascade_find('books', 'root')->as_scalar || 'private/books' );
+    $books->file_name( $self->books_path );
     $books->rebuild;
 
     $self->books($books);
@@ -101,14 +104,14 @@ sub instance {
     return $INSTANCE if $INSTANCE;
 
     my $pkg = shift;
-    my ( $app_path ) = @_;
-    $app_path ||= '.';
+    my %args = @_;
+    $args{app_path} ||= '.';
 
     $INSTANCE = $pkg->new([
         '/~test/(.+)' => 'Docs::Application::Handler::Test',
         '/(.*)' => 'Docs::Application::Handler::Node',
         ],
-        app_path => $app_path
+        %args,
     );
 
     $INSTANCE->init;

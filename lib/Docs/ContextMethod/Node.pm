@@ -20,7 +20,20 @@ sub hidden {
     my $node = shift;
     my $ctx = shift;
 
-    $node->metadata->ctx_find($ctx, 'hidden')->as_scalar;
+    if ( defined( my $hidden = $node->metadata->ctx_find($ctx, 'hidden')->as_scalar ) ) {
+        return $hidden;
+    }
+
+    if ( $node->folder && defined( my $show_only = $node->folder->metadata->ctx_find($ctx, 'show_only')->as_array ) ) {
+        if ( @$show_only ) {
+            for my $name ( @$show_only ) {
+                return 0 if $name eq $node->uri_name;
+            }
+            return 1;
+        }
+    }
+
+    0;
 }
 
 sub children {
@@ -188,7 +201,7 @@ sub body {
 
     # Language filter.
     $source =~ s|<docs:lang ([a-z]+)>\s*(.*?)\s*</docs:lang>|{$1 eq $ctx->language->key? $2: ''}|iges;
-    
+
     #my $macro = $ctx->new_macro( template => $source );
     #$body = $macro->render || $source;
 
@@ -198,12 +211,41 @@ sub body {
     $body;
 }
 
+sub html {
+    my $node = shift;
+    my $ctx = shift;
+
+    my $body = $node->ctx_body($ctx);
+
+    my $helper = $ctx->new_helper || return $body;
+    $body =~ s!<docs:(node|tag)\s+([^>\s]+)\s*/?>!{
+        my $result = $&;
+        my ( $type, $arg ) = ( $1, $2 );
+        if ( $type eq 'node' ) {
+            if ( my $target = $node->path_find($arg) ) {
+                $result = $helper->link_to_node($target) || $result;
+            }
+        } elsif ( $type eq 'tag' ) {
+            my $tag = Docs::Model::Node::Tag->new(
+                raw => $arg,
+                node => $node,
+            );
+            $result = $helper->link_to_tag($tag) || $result;
+        }
+        $result;
+    }!iegs;
+
+    $body;
+}
+
 sub plain_text {
     my $node = shift;
     my $ctx = shift;
 
     my $body = $node->ctx_body($ctx);
     $body =~ s!<[^>]*>! !sg;
+
+    $body;
 }
 
 sub plain_text_without_headlines {
@@ -251,6 +293,25 @@ sub tags {
         node => $node,
         raw => $_
     ) } @{$node->ctx_raw_tags($ctx)};
+
+    wantarray? @tags: \@tags;
+}
+
+sub tags_include_body {
+    my $node = shift;
+    my $ctx = shift;
+
+    my %tags = map { $_ => 1 } @{$node->ctx_raw_tags($ctx)};
+    my $body = $node->ctx_body($ctx);
+
+    while ( $body =~ m!<docs:tag\s+([^>\s]+)\s*/?>!isg ) {
+        $tags{$1} = 1;
+    }
+
+    my @tags = map { Docs::Model::Node::Tag->new(
+        node => $node,
+        raw => $_
+    ) } keys %tags;
 
     wantarray? @tags: \@tags;
 }
@@ -351,6 +412,21 @@ sub _sibling {
 
 sub next { _sibling('next_sibling', @_); }
 sub prev { _sibling('prev_sibling', @_); }
+
+sub flat_next {
+    my $node = shift;
+    my $ctx = shift;
+    pop;
+
+    while ( $node ) {
+        if ( my $next = $node->ctx_next($ctx) ) {
+            return $next;
+        }
+        $node = $node->parent;
+    }
+
+    undef;
+}
 
 sub glossary {
     my $node = shift;

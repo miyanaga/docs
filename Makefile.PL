@@ -1,6 +1,24 @@
 use inc::Module::Install;
 name 'Docs';
 all_from 'lib/Docs.pm';
+
+requires 'Any::Moose' => '';
+requires 'Carp' => '';
+requires 'DateTime' => '';
+requires 'Digest::MD5' => '';
+requires 'Encode' => '';
+requires 'File::Spec' => '';
+requires 'NetAddr::IP' => '';
+requires 'Plack::App::File' => '';
+requires 'Plack::Middleware' => '';
+requires 'Plack::Util::Accessor' => '';
+requires 'Tatsumaki::Application' => '';
+requires 'Tatsumaki::Handler' => '';
+requires 'Text::Markdown' => '';
+requires 'Text::MicroTemplate::Extended' => '';
+requires 'URI::Escape' => '';
+requires 'YAML::Syck' => '';
+
 build_requires 'Test::More';
 test_requires 'Test::Requires';
 use_test_base;

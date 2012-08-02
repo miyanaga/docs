@@ -5,7 +5,7 @@ use utf8;
 use Test::More;
 use Docs;
 
-my $app = Docs::app;
+my $app = Docs::app(books_path => 't/books');
 my $books = $app->books;
 my $book = $books->find_uri('example');
 my $folder = $book->find_uri('groonga');

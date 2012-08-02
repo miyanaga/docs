@@ -54,6 +54,44 @@
         });
     };
 
+    // TOC
+    $.fn.docsHeadlinesShortcut = function(options) {
+        var defaults = {
+            target: 'h1',
+            prefix: 'docs-headline',
+            delimiter: '-',
+            selector: '.docs-headline-shortcuts',
+            addAnchor: function(anchor, title, count) {
+                var $li = $('<li><a></a></li>');
+                $li.find('a').attr('href', '#' + anchor).text(' ' + title).prepend($('<i class="icon-share-alt">'));
+                $(this).append($li);
+                if ( count > 1 ) $(this).show();
+            },
+        };
+        var opts = $.extend(defaults, options);
+
+        var i = 0;
+        return this.each(function() {
+            i++;
+            var $article = $(this),
+                toc = $(this).find(opts.selector).get(0);
+
+            var j = 0;
+            console.log(toc);
+            $(this).find(opts.target).each(function() {
+                j++;
+                var $target = $(this);
+
+                if ( $target.text() ) {
+                    var anchor = opts.prefix + i + opts.delimiter + j;
+                    var $a = $('<a></a>').attr('name', anchor);
+                    $target.before($a);
+                    opts.addAnchor.call(toc, anchor, $target.text(), j);
+                }
+            });
+        });
+    };
+
     // Load relations
     $.fn.docsLoadRelations = function(options) {
         var defaults = {};
@@ -167,6 +205,9 @@ jQuery(function() {
 
     $('div.docs-node-relations').docsLoadRelations();
     $('body').docsSitemapOpener();
+
+    // Headline shortcut
+    $('article.docs-node section.docs-node-body').docsHeadlinesShortcut();
 
     // Grossaly
     $('article.docs-node').docsReplaceGrossaly({

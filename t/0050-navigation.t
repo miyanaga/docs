@@ -5,7 +5,7 @@ use utf8;
 use Test::More;
 use Docs;
 
-my $app = Docs::app;
+my $app = Docs::app(books_path => 't/books');
 my $books = $app->books;
 my $book = $books->find_uri('example');
 
@@ -14,7 +14,7 @@ my $book = $books->find_uri('example');
     my $map = $book->ctx_navigation_map($ctx);
 
     is $map->{ctx_title}, 'Example';
-    is scalar(keys(%{$map->{children}->{en}->{children}})), 5;
+    is scalar(keys(%{$map->{children}->{en}->{children}})), 6;
     is $map->{children}->{en}->{children}->{multilang}->{ctx_title}, 'Multi Language Folder';
     is $map->{children}->{en}->{children}->{multilang}->{children}->{document}->{ctx_title}, 'Multi Language Document';
 }
@@ -24,7 +24,7 @@ my $book = $books->find_uri('example');
     my $map = $book->ctx_navigation_map($ctx);
 
     is $map->{ctx_title}, 'Example';
-    is scalar(keys(%{$map->{children}->{en}->{children}})), 5;
+    is scalar(keys(%{$map->{children}->{en}->{children}})), 6;
     is $map->{children}->{en}->{children}->{multilang}->{ctx_title}, '多言語フォルダ';
     is $map->{children}->{en}->{children}->{multilang}->{children}->{document}->{ctx_title}, '多言語ドキュメント';
 }

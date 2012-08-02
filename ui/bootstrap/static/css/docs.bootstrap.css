@@ -120,6 +120,20 @@ body.docs-search-tag .docs-search-box {
 
 #navigation-tags .docs-tag-cloud {
     margin-bottom: 16px;
+    text-align: center;
+}
+
+article.docs-node .docs-headline-shortcuts {
+    display: none;
+    padding: 5px;
+    margin-left: 16px;
+}
+
+@media screen and ( max-width: 768px ) {
+    article.docs-node .docs-headline-shortcuts {
+        float: none;
+        margin-left: 0px;
+    }
 }
 
 article.docs-node section h1,

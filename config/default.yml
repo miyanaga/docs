@@ -94,6 +94,10 @@ context_methods:
         package: Docs::Model::Node
         method: body
         code: Docs::ContextMethod::Node::body
+    core.node.html:
+        package: Docs::Model::Node
+        method: html
+        code: Docs::ContextMethod::Node::html
     core.node.body_without_lead:
         package: Docs::Model::Node
         method: body_without_lead
@@ -134,6 +138,10 @@ context_methods:
         package: Docs::Model::Node
         method: tags
         code: Docs::ContextMethod::Node::tags
+    core.node.tags_include_body:
+        package: Docs::Model::Node
+        method: tags_include_body
+        code: Docs::ContextMethod::Node::tags_include_body
     core.node.normalize:
         package: Docs::Model::Node
         method: normalize
@@ -166,6 +174,10 @@ context_methods:
         package: Docs::Model::Node
         method: prev
         code: Docs::ContextMethod::Node::prev
+    core.node.flat_next:
+        package: Docs::Model::Node
+        method: flat_next
+        code: Docs::ContextMethod::Node::flat_next
     core.node.glossary:
         package: Docs::Model::Node
         method: glossary

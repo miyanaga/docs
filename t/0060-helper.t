@@ -6,7 +6,7 @@ use Test::More;
 use Docs;
 use Docs::UI::Helper;
 
-my $app = Docs::app;
+my $app = Docs::app(books_path => 't/books');
 
 {
     my $ctx = $app->new_context(lang => 'en');

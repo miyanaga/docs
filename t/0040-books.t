@@ -6,7 +6,7 @@ use Test::More;
 use Docs;
 use Docs::Context;
 
-my $app = Docs::app;
+my $app = Docs::app(books_path => 't/books');
 
 my $books = $app->books;
 my $ctx = Docs::Context->new;
@@ -14,7 +14,7 @@ my $ctx = Docs::Context->new;
 {
     ok $books;
     is $books->uri_name, '';
-    is $books->file_name, 'private/books';
+    is $books->file_name, 't/books';
 }
 
 my $book = $books->find_uri('example');
@@ -26,7 +26,7 @@ my $book = $books->find_uri('example');
     is $book->naming->title, 'Example';
 
     my @children = values %{$book->children('uri')};
-    is scalar @children, 6;
+    is scalar @children, 7;
 }
 
 my $en = $book->find_uri('en');
@@ -39,7 +39,7 @@ my $en = $book->find_uri('en');
     is $en->naming->title, 'English';
 
     my @children = values %{$en->children('uri')};
-    is scalar @children, 5;
+    is scalar @children, 6;
 }
 
 my $ja = $book->find_uri('ja');
@@ -240,6 +240,9 @@ my $ja = $book->find_uri('ja');
     is $third->ctx_next($ctx)->ctx_next($ctx), undef;
     is $third->ctx_prev($ctx)->uri_name, 'first';
     is $third->ctx_prev($ctx)->ctx_prev($ctx), undef;
+
+    my $fourth = $books->path_find('/example/en/sibling/fourth');
+
 }
 
 {
@@ -249,6 +252,63 @@ my $ja = $book->find_uri('ja');
 
     is $third->ctx_number($ctx), '2.';
     is $third->ctx_numbering($ctx), '1.5.2.';
+}
+
+{
+    my $third = $books->path_find('/example/en/sibling/third');
+    ok $third;
+    is $third->folder->uri_name, 'sibling';
+    is $third->folder->folder->uri_name, 'sibling';
+
+    my $sibling = $third->path_find('.');
+    is $sibling->uri_name, 'sibling';
+
+    $sibling = $third->path_find('../sibling');
+    is $sibling->uri_name, 'sibling';
+
+    my $en = $third->path_find('..');
+    is $en->uri_name, 'en';
+
+    $en = $sibling->path_find('..');
+    is $en->uri_name, 'en';
+
+    my $example = $third->path_find('../..');
+    is $example->uri_name, 'example';
+}
+
+{
+    my $visibility = $books->path_find('/example/en/visibility');
+    ok $visibility;
+
+    my $first = $visibility->find_uri('first');
+    my $second = $visibility->find_uri('second');
+    my $third = $visibility->find_uri('third');
+    my $fourth = $visibility->find_uri('fourth');
+    my $fifth = $visibility->find_uri('fifth');
+
+    {
+        my $ctx = $app->new_context(lang => 'en');
+        is $first->ctx_hidden($ctx), 0;
+        is $second->ctx_hidden($ctx), 1;
+        is $third->ctx_hidden($ctx), 0;
+        is $fourth->ctx_hidden($ctx), 1;
+        is $fifth->ctx_hidden($ctx), 1;
+
+        my @children = map { $_->uri_name } @{$visibility->ctx_children($ctx)};
+        is_deeply \@children, [qw/first third/];
+    }
+
+    {
+        my $ctx = $app->new_context(lang => 'ja');
+        is $first->ctx_hidden($ctx), 1;
+        is $second->ctx_hidden($ctx), 0;
+        is $third->ctx_hidden($ctx), 1;
+        is $fourth->ctx_hidden($ctx), 0;
+        is $fifth->ctx_hidden($ctx), 1;
+
+        my @children = map { $_->uri_name } @{$visibility->ctx_children($ctx)};
+        is_deeply \@children, [qw/second fourth/];
+    }
 }
 
 {
@@ -321,6 +381,35 @@ my $ja = $book->find_uri('ja');
             description => 'Wikiに似たテキスト記法のひとつで、HTMLとの互換性があります。',
         },
     };
+}
+
+{
+    my $docstags = $book->find_uri(qw/docstags folder index/);
+    ok $docstags;
+
+    my $ctx = $app->new_context(lang => 'en');
+    my $html = $docstags->ctx_html($ctx);
+
+    is $html, <<'HTML';
+<p><a href="/example/en"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
+<a href="/example/en"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
+<a href="/example/docstags"><span class="docs-numbering">6.</span> <span class="docs-node-title">DocsTags</span></a>
+<a href="/example/docstags/folder"><span class="docs-numbering">6.1.</span> <span class="docs-node-title">Folder</span></a>
+<a href="/example/en"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
+<a href="/example/en"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
+<a class="label" href="/example?action=search&amp;q=tag%3ABODY%3ATAG1">TAG1</a>
+<a class="label" href="/example?action=search&amp;q=tag%3ABODY%3ATAG2">TAG2</a></p>
+HTML
+}
+
+{
+    my $docstags = $book->find_uri(qw/docstags folder index/);
+    ok $docstags;
+
+    my $ctx = $app->new_context(lang => 'en');
+    my @tags = sort { $a cmp $b } map { $_->raw } @{$docstags->ctx_tags_include_body($ctx)};
+
+    is_deeply \@tags, [qw/BODY:TAG1 BODY:TAG2 META:TAG1 META:TAG2/];
 }
 
 done_testing;

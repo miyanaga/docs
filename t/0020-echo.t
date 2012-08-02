@@ -6,7 +6,7 @@ use utf8;
 
 use Docs;
 
-my $app = Docs::app;
+my $app = Docs::app(books_path => 't/books');
 test_psgi $app, sub {
     my $cb = shift;
     my $res = $cb->(GET "http://localhost/~test/echo?echo=hello");

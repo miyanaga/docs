@@ -108,7 +108,7 @@ sub groonga_load {
     my $node = shift;
     my $ctx = shift;
     my $book = $node->book || Carp::confess('book not found');
-    my @tags = $node->ctx_tags($ctx);
+    my @tags = $node->ctx_tags_include_body($ctx);
 
     {
         my $groonga = $book->ctx_groonga_console($ctx);

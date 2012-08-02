@@ -53,7 +53,7 @@ sub path_find {
     if ( substr( $path, 0, 1 ) eq '/' ) {
         $self->books->path_find( substr( $path, 1 ) );
     } else {
-        $self->find_uri( grep { $_ } split '/', $path );
+        $self->folder->find_uri( grep { $_ } split '/', $path );
     }
 }
 
@@ -68,6 +68,11 @@ sub is_folder { eval { shift->isa('Docs::Model::Node::Folder'); }; }
 sub is_book { eval { shift->isa('Docs::Model::Node::Book'); }; }
 sub is_books { eval { shift->isa('Docs::Model::Node::Books'); }; }
 sub is_index { shift->uri_name eq 'index'; }
+
+sub folder {
+    my $self = shift;
+    $self->is_folder? $self: $self->parent || $self;
+}
 
 sub index_node {
     shift->find_uri('index');
