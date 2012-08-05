@@ -8,6 +8,7 @@ use Sweets::String qw(trim);
 use Docs::Model::Node::Tag;
 use Docs::Model::Node::Headline;
 use Digest::MD5 qw(md5_hex);
+use HTML::Entities;
 
 sub url {
     my $node = shift;
@@ -200,7 +201,14 @@ sub body {
     my $source = $node->source || return '';
 
     # Language filter.
-    $source =~ s|<docs:lang ([a-z]+)>\s*(.*?)\s*</docs:lang>|{$1 eq $ctx->language->key? $2: ''}|iges;
+    $source =~ s|<docs:lang\s+([a-z]+)>\s*(.*?)\s*</docs:lang>|{$1 eq $ctx->language->key? $2: ''}|iges;
+
+    # docs:pre, docs:escape
+    $source =~ s!<docs:(pre)(\s+[^>]*|\s*)>(.*?)</docs:\1>!{
+        my $attr = $2;
+        my $inner = encode_entities($3, q{<>&"});
+        lc($1) eq 'pre'? qq{<pre$attr>$inner</pre>}: $inner;
+    }!iegs;
 
     #my $macro = $ctx->new_macro( template => $source );
     #$body = $macro->render || $source;
@@ -218,12 +226,16 @@ sub html {
     my $body = $node->ctx_body($ctx);
 
     my $helper = $ctx->new_helper || return $body;
-    $body =~ s!<docs:(node|tag)\s+([^>\s]+)\s*/?>!{
+    $body =~ s!<docs:(node|link|tag)\s+([^>\s]+)\s*/?>!{
         my $result = $&;
-        my ( $type, $arg ) = ( $1, $2 );
-        if ( $type eq 'node' ) {
+        my ( $type, $arg ) = ( lc($1), $2 );
+        if ( $type eq 'node' || $type eq 'link' ) {
             if ( my $target = $node->path_find($arg) ) {
-                $result = $helper->link_to_node($target) || $result;
+                my %attrs;
+                if ( $result && $arg && $arg =~ m/#(.*)$/ ) {
+                    $attrs{hash} = $1;
+                }
+                $result = $helper->link_to_node($target, %attrs) || $result;
             }
         } elsif ( $type eq 'tag' ) {
             my $tag = Docs::Model::Node::Tag->new(

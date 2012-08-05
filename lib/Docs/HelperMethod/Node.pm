@@ -7,7 +7,7 @@ use Carp;
 
 sub link_to_node {
     my $self = shift;
-    my $node = shift;
+    my $node = shift || return '[Unknown Node]';
     pop;
     my %args = @_;
     my $ctx = $self->context;
@@ -28,13 +28,14 @@ sub link_to_node {
     delete $args{attr}->{href} if $args{attr};
     $args{raw_attr} ||= {};
     $args{raw_attr}->{href} = $node->ctx_url($ctx);
+    $args{raw_attr}->{href} .= '#' . delete $args{hash} if $args{hash};
 
     $self->element('a', %args);
 }
 
 sub link_to_tag {
     my $self = shift;
-    my $tag = shift;
+    my $tag = shift || return '[Unknown Tag]';
     pop;
     my %args = @_;
 

@@ -46,6 +46,28 @@ has languages => ( is => 'ro', isa => 'ArrayRef', lazy_build => 1, builder => su
     \@languages;
 });
 
+has node_index => ( is => 'ro', isa => 'HashRef', default => sub { {} } );
+
+sub set_node_by_id {
+    my $self = shift;
+    my ( $node ) = @_;
+
+    if ( $node->id ) {
+        $self->node_index->{$node->id} = $node->uri_path;
+    }
+}
+
+sub get_node_by_id {
+    my $self = shift;
+    my ( $id ) = @_;
+
+    if ( my $path = $self->node_index->{$id} ) {
+        if ( my $node = $self->path_find($path) ) {
+            return $node;
+        }
+    }
+}
+
 sub child_class {
     my $self = shift;
     my ( $file_name, $file_path ) = @_;

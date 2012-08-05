@@ -26,6 +26,7 @@ requires:
   Encode: 0
   File::Spec: 0
   Filter::Util::Call: 0
+  FindBin::libs: 0
   NetAddr::IP: 0
   Plack::App::File: 0
   Plack::Middleware: 0

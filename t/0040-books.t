@@ -397,6 +397,9 @@ my $ja = $book->find_uri('ja');
 <a href="/example/docstags/folder"><span class="docs-numbering">6.1.</span> <span class="docs-node-title">Folder</span></a>
 <a href="/example/en"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
 <a href="/example/en"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
+<a href="/example/en/formatters/mddoc"><span class="docs-numbering">1.1.2.</span> <span class="docs-node-title">MarkdownDocument</span></a>
+<a href="/example/en/formatters/htmldoc#anchor"><span class="docs-numbering">1.1.1.</span> <span class="docs-node-title">HTMLDocument</span></a>
+<a href="/example/docstags/folder"><span class="docs-numbering">6.1.</span> <span class="docs-node-title">Folder</span></a>
 <a class="label" href="/example?action=search&amp;q=tag%3ABODY%3ATAG1">TAG1</a>
 <a class="label" href="/example?action=search&amp;q=tag%3ABODY%3ATAG2">TAG2</a></p>
 HTML
@@ -411,5 +414,25 @@ HTML
 
     is_deeply \@tags, [qw/BODY:TAG1 BODY:TAG2 META:TAG1 META:TAG2/];
 }
+
+{
+    my $docspre = $book->find_uri(qw/docstags pre/);
+    ok $docspre;
+
+    my $ctx = $app->new_context(lang => 'en');
+    is $docspre->ctx_html($ctx), q{<pre class="lang">
+    &lt;!--
+        id: pre
+        test: &amp;abc
+    --&gt;
+</pre>
+
+<pre>
+    &lt;html&gt;&lt;/html&gt;
+</pre>
+};
+}
+
+
 
 done_testing;

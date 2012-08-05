@@ -1,4 +1,5 @@
 <!--
+id: markdown
 glossary:
     Markdown:
         desc: One of text writing style like Wiki, and compatible with HTML.

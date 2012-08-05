@@ -25,6 +25,11 @@ has books => ( is => 'ro', isa => 'Any', lazy_build => 1, builder => sub {
 has book => ( is => 'ro', isa => 'Any', lazy_build => 1, builder => sub {
     shift->parent_at(1) || 0;
 });
+has id => ( is => 'ro', isa => 'Str', lazy => 1, default => sub {
+    my $id = shift->metadata->find('id')->as_scalar;
+    $id =~ s!#.*$!! if defined $id;
+    defined $id? $id: '';
+});
 
 sub new_metadata {
     my $self = shift;
@@ -50,11 +55,21 @@ sub path_find {
     my $self = shift;
     my ( $path ) = @_;
     return $self if !defined($path) || $path eq '';
-    if ( substr( $path, 0, 1 ) eq '/' ) {
-        $self->books->path_find( substr( $path, 1 ) );
+    $path =~ s!#.*$!!;
+    my $head = substr( $path, 0, 1 );
+    
+    my $node;
+    if ( $head eq '/' ) {
+        $node = $self->books->path_find( substr( $path, 1 ) );
+    } elsif ( $head eq '@' ) {
+        $node = $self->books->get_node_by_id( substr( $path, 1 ) );
     } else {
-        $self->folder->find_uri( grep { $_ } split '/', $path );
+        my @path = grep { $_ } split '/', $path;
+        pop @path if $path[-1] && $path[-1] eq 'index';
+        $node = $self->folder->find_uri( grep { $_ } split '/', $path );
     }
+
+    $node && $node->is_index? $node->parent: $node;
 }
 
 sub is_in_uri_path {
@@ -106,6 +121,8 @@ sub rebuild {
 
     $self->clear_metadata;
     $self->clear_stashes;
+
+    $self->books->set_node_by_id($self);
 }
 
 sub ctx_base_href {

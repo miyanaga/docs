@@ -18,6 +18,7 @@ requires 'Text::Markdown' => '';
 requires 'Text::MicroTemplate::Extended' => '';
 requires 'URI::Escape' => '';
 requires 'YAML::Syck' => '';
+requires 'FindBin::libs' => '';
 
 build_requires 'Test::More';
 test_requires 'Test::Requires';
