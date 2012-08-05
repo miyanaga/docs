@@ -6,10 +6,18 @@ use warnings;
 use Docs;
 
 {
-    sub _facebook_app_id {
+    sub _facebook_comment {
+        my $self = shift;
         my $app = Docs::app;
-        $app->config->cascade_find(qw/facebook_comment app_id/)->as_scalar
-            || return '';
+        my $ctx = $self->context || return;
+        my $node = $ctx->node || return;
+
+        my $app_id = $node->metadata->ctx_cascade_find($ctx, qw/facebook_comment app_id/)->as_scalar;
+        my $posts = $node->metadata->ctx_cascade_find($ctx, qw/facebook_comment posts/)->as_scalar;
+        my $url = $node->uri_path;
+        my $hidden = $node->metadata->ctx_cascade_find($ctx, qw/facebook_comment hidden/)->as_scalar;
+
+        ( $app_id, $posts, $url, $hidden );
     }
 }
 
@@ -17,7 +25,9 @@ sub comment_load {
     my $self = shift;
     pop;
 
-    my $app_id = _facebook_app_id || return '';
+    my ( $app_id, $posts, $url, $hidden ) = _facebook_comment($self);
+    return '' unless $app_id;
+    return '' if $hidden;
 
     return qq|
 <div id="fb-root"></div>
@@ -40,11 +50,9 @@ sub comment_form {
     my $self = shift;
     pop;
 
-    my $app = Docs::app;
-    my $app_id = _facebook_app_id || return '';
-    my $posts = $app->config->cascade_find(qw/facebook_comment posts/)->as_scalar || 10;
-    my $node = $self->context->node || return;
-    my $node_path = $node->uri_path;
+    my ( $app_id, $posts, $url, $hidden ) = _facebook_comment($self);
+    return '' unless $app_id;
+    return '' if $hidden;
 
     return qq|
 <div class="facebook-comment">

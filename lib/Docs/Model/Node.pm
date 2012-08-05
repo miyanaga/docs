@@ -46,6 +46,10 @@ sub uri_name { shift->name('uri', @_) }
 sub file_name { shift->name('file', @_) }
 
 sub uri_path { shift->build_path('uri', '/') }
+sub normalized_uri_path {
+    my $self = shift;
+    $self->is_index? $self->folder->uri_path: $self->uri_path;
+}
 sub file_path { shift->build_path('file', '/') }
 
 sub find_uri { shift->find('uri', @_) };
@@ -57,7 +61,7 @@ sub path_find {
     return $self if !defined($path) || $path eq '';
     $path =~ s!#.*$!!;
     my $head = substr( $path, 0, 1 );
-    
+
     my $node;
     if ( $head eq '/' ) {
         $node = $self->books->path_find( substr( $path, 1 ) );

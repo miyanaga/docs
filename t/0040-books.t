@@ -327,10 +327,12 @@ my $ja = $book->find_uri('ja');
         extension => {
             keyword => 'extension',
             description => 'The last part of filename describes file type.',
+            link => '',
         },
         html => {
             keyword => 'HTML',
             description => 'Hyper Text Markup Language',
+            link => '',
         },
     };
 
@@ -340,14 +342,17 @@ my $ja = $book->find_uri('ja');
         extension => {
             keyword => 'extension',
             description => 'The last part of filename describes file type.',
+            link => '',
         },
         html => {
             keyword => 'HTML',
             description => 'Hyper Text Markup Language',
+            link => '',
         },
         markdown => {
             keyword => 'Markdown',
             description => 'One of text writing style like Wiki, and compatible with HTML.',
+            link => '',
         },
     };
 
@@ -358,10 +363,12 @@ my $ja = $book->find_uri('ja');
         '拡張子' => {
             keyword => '拡張子',
             description => 'ファイル名の最後の部分でファイルのタイプを示します。',
+            link => '',
         },
         html => {
             keyword => 'HTML',
             description => 'ハイパーテキストマークアップ言語',
+            link => '',
         },
     };
 
@@ -371,14 +378,17 @@ my $ja = $book->find_uri('ja');
         '拡張子' => {
             keyword => '拡張子',
             description => 'ファイル名の最後の部分でファイルのタイプを示します。',
+            link => '',
         },
         html => {
             keyword => 'HTML',
             description => 'ハイパーテキストマークアップ言語',
+            link => '',
         },
         markdown => {
             keyword => 'Markdown',
             description => 'Wikiに似たテキスト記法のひとつで、HTMLとの互換性があります。',
+            link => '',
         },
     };
 }

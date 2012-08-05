@@ -58,6 +58,10 @@ context_methods:
         package: Docs::Model::Node
         method: url
         code: Docs::ContextMethod::Node::url
+    core.node.order:
+        package: Docs::Model::Node
+        method: order
+        code: Docs::ContextMethod::Node::order
     core.node.hidden:
         package: Docs::Model::Node
         method: hidden

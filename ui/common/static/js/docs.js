@@ -153,13 +153,13 @@
     };
 
     // Glossary
-    $.fn.docsReplaceGrossaly = function(options) {
+    $.fn.docsReplaceGlossary = function(options) {
         var defaults = {
             target: '.docs-node-body p,.docs-node-body td',
             replace: function(original, glossary) {
                 return original;
             }
-            // complete: function(grossaly, used)
+            // complete: function(glossary, used)
         };
         var opts = $.extend(defaults, options);
 
@@ -170,7 +170,7 @@
             if (!url) return;
 
             $.get($node.attr('data-node-url'), {
-                action: 'grossaly'
+                action: 'glossary'
             }, function(data) {
                 // RegExp
                 var keywords = [];

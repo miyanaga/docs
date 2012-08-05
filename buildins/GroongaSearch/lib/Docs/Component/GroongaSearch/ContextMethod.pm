@@ -107,6 +107,8 @@ sub groonga_step_paths {
 sub groonga_load {
     my $node = shift;
     my $ctx = shift;
+    return if $node->ctx_hidden($ctx);
+    
     my $book = $node->book || Carp::confess('book not found');
     my @tags = $node->ctx_tags_include_body($ctx);
 

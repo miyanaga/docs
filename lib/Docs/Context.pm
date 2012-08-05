@@ -34,20 +34,22 @@ has app => ( is => 'rw', isa => 'Docs::Application', lazy_build => 1, builder =>
 has is_admin => ( is => 'rw', isa => 'Bool', lazy => 1, default => sub {
     my $self = shift;
     my $app = Docs->app;
-    my @subnets = $app->config->cascade_find(qw/admin subnet/)->as_array;
-    return 1 unless @subnets;
 
-    my @match_headers = $app->config->cascade_find(qw/admin match_header/)->as_array;
-    push @match_headers, 'REMOTE_ADDR' unless @match_headers;
+    my $networks = $app->config->cascade_find(qw/admin_networks/)->as_hash || return 1;
+    while ( my ( $location, $network ) = each %$networks ) {
+        my $subnets = $app->config->cascade_find( 'admin_networks', $location, 'allow_from' )->as_array || next;
+        next unless @$subnets;
+        my $headers = $app->config->cascade_find( 'admin_networks', $location, 'http_header' )->as_array;
+        push @$headers, qw/REMOTE_ADDR X-Real-IP/ unless @$headers;
 
-    for my $header ( @match_headers ) {
-        my $value = $self->handler->request->env->{$header}
-            || next;
-        print STDERR $value;
-        my $remote = NetAddr::IP->new($value);
-        for my $subnet ( @subnets ) {
-            $subnet = NetAddr::IP->new($subnet);
-            return 1 if $subnet->contains($remote);
+        for my $header ( @$headers ) {
+            my $value = $self->handler->request->env->{$header}
+                || next;
+            my $remote = NetAddr::IP->new($value);
+            for my $subnet ( @$subnets ) {
+                $subnet = NetAddr::IP->new($subnet);
+                return 1 if $subnet->contains($remote);
+            }
         }
     }
 

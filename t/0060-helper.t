@@ -67,17 +67,10 @@ my $app = Docs::app(books_path => 't/books');
 }
 
 {
-    my $node = $app->books->path_find('/example/en');
+    my $node = $app->books->path_find('/example/en/index');
     my $ctx = $app->new_context(lang => 'en', node => $node);
 
     my $helper = Docs::UI::Helper->new(context => $ctx);
-
-    $app->config->raw({
-        facebook_comment => {
-            app_id => '0123456789',
-            posts => 2,
-        },
-    });
 
     is $helper->facebook_comment_load, q|
 <div id="fb-root"></div>
@@ -101,11 +94,10 @@ my $app = Docs::app(books_path => 't/books');
 </div>
 |;
 
-    $app->config->raw({
-        facebook_comment => {
-            app_id => '',
-        },
-    });
+    $node = $app->books->path_find('/example/ja');
+    $ctx = $app->new_context(lang => 'en', node => $node);
+    $helper = $ctx->new_helper;
+
     is $helper->facebook_comment_load, '';
     is $helper->facebook_comment_form, '';
 }

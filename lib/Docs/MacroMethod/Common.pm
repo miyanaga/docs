@@ -8,7 +8,6 @@ use Sweets::Text::Xsv;
 
 sub lang {
     my ( $macro, $args, $inner ) = @_;
-    print STDERR $inner;
     my $lang = $args->{''} || $args->{lang}
         || return $macro->render($inner);
     $lang eq $macro->context->language->key? $macro->render($inner): '';

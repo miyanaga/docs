@@ -17,6 +17,16 @@ sub url {
     $node->uri_path;
 }
 
+sub order {
+    my $node = shift;
+    my $ctx = shift;
+
+    my $order = $node->metadata->ctx_find($ctx, 'order')->as_scalar;
+    $order = $node->order unless defined $order;
+
+    int($order);
+}
+
 sub hidden {
     my $node = shift;
     my $ctx = shift;
@@ -43,6 +53,8 @@ sub children {
 
     my @children = grep {
         !$_->ctx_hidden($ctx) && !$_->is_index;
+    } sort {
+        $a->ctx_order($ctx) <=> $b->ctx_order($ctx)
     } @{$node->sorted_children('uri')};
 
     wantarray? @children: \@children;
@@ -508,7 +520,14 @@ sub glossary {
             || $glossary->ctx_find($ctx, $_, 'description')->as_scalar
             || '';
 
-        ( lc($keyword) => { keyword => $keyword, description => $desc } );
+        my $link;
+        if ( $link = $glossary->ctx_find($ctx, $_, 'link')->as_scalar || '' ) {
+            if ( my $link_node = $node->path_find($link) ) {
+                $link = $link_node->normalized_uri_path;
+            }
+        }
+
+        ( lc($keyword) => { keyword => $keyword, description => $desc, link => $link } );
     } keys %$words;
 
     return \%result;

@@ -77,7 +77,6 @@
                 toc = $(this).find(opts.selector).get(0);
 
             var j = 0;
-            console.log(toc);
             $(this).find(opts.target).each(function() {
                 j++;
                 var $target = $(this);
@@ -209,19 +208,23 @@ jQuery(function() {
     // Headline shortcut
     $('article.docs-node section.docs-node-body').docsHeadlinesShortcut();
 
-    // Grossaly
-    $('article.docs-node').docsReplaceGrossaly({
+    // Glossary
+    $('article.docs-node').docsReplaceGlossary({
         target: '.docs-node-body p, .docs-node-body td',
-        replace: function(original, grossaly) {
-            var $wrap = $('<p><u rel="tooltip"></u><sup></sup></p>');
-            $wrap.find('u').attr('title', grossaly.description).text(original);
-            $wrap.find('sup').text('*' + grossaly.index);
+        replace: function(original, glossary) {
+            var $wrap = glossary.link && glossary.link != ''
+                ? $('<p><a rel="tooltip"></a><sup></sup></p>')
+                : $('<p><u rel="tooltip"></u><sup></sup></p>')
+            $wrap.find('*[rel=tooltip]').attr('title', glossary.description).text(original);
+            $wrap.find('sup').text('*' + glossary.index);
+            if ( glossary.link && glossary.link != '' )
+                $wrap.find('a').attr('href', glossary.link);
             return $wrap.html();
         },
-        complete: function(grossaly, used) {
+        complete: function(glossary, used) {
             var $node = $(this);
             $node.find('.docs-node-body').tooltip({
-                selector: 'u[rel=tooltip]'
+                selector: '*[rel=tooltip]'
             });
 
             if (used && used.length > 0) {
@@ -229,7 +232,7 @@ jQuery(function() {
                 $.each(used, function(i, g) {
                     var $dt = $('<dt><span></span> <u></u></dt>');
                     $dt.find('span').text('*' + g.index);
-                    $dt.find('u').text(g.keyword);
+                    $dt.find('*[rel=tooltip]').text(g.keyword);
                     var $dd = $('<dd></dd>').text(g.description);
 
                     $dl.append($dt).append($dd);

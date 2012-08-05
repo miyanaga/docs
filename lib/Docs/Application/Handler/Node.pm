@@ -5,6 +5,7 @@ use warnings;
 use parent 'Docs::Application::Handler';
 
 use Docs;
+use JSON;
 use Any::Moose;
 
 has node => ( is => 'ro', isa => 'Docs::Model::Node', lazy_build => 1, builder => sub {
@@ -85,7 +86,7 @@ sub relations {
     # Make unique by path
     my %unique;
     @nodes = grep {
-        my $path = $_->uri_path;
+        my $path = $_->normalized_uri_path;
         $_ == $node
             ? 0
             : $unique{$path}
@@ -96,7 +97,7 @@ sub relations {
     $self->render('partial/node/relations', nodes => \@nodes );
 }
 
-sub grossaly {
+sub glossary {
     my $self = shift;
     my $ctx = $self->context;
     my $node = $self->node;
