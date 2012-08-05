@@ -39,7 +39,7 @@ my $en = $book->find_uri('en');
     is $en->naming->title, 'English';
 
     my @children = values %{$en->children('uri')};
-    is scalar @children, 6;
+    is scalar @children, 7;
 }
 
 my $ja = $book->find_uri('ja');
@@ -433,6 +433,39 @@ HTML
 };
 }
 
+{
+    my $en = $book->find_uri(qw/en index/);
+    ok $en;
 
+    my $ctx = $app->new_context(lang => 'en');
+    is $en->ctx_first_paragraph($ctx), q{This is English document.<br />
+The quick brown fox jumps over the lazy dog<br />
+The quick brown fox jumps over the lazy dog<br />
+The quick brown fox jumps over the lazy dog<br />
+The quick brown fox jumps over the lazy dog<br />
+The quick brown fox jumps over the lazy dog<br />};
+    is $en->ctx_excerpt($ctx), q{This is English document. The quick brown fox jumps over the lazy dog The quick brown fox jumps over the lazy dog The quick brown fox jumps over the lazy dog The quick brown fox jumps over the lazy dog The...};
+}
+
+{
+    my $mddoc = $book->find_uri(qw/en formatters mddoc/);
+    ok $mddoc;
+
+    my $ctx = $app->new_context(lang => 'en');
+    my $excerpt = $mddoc->ctx_excerpt($ctx);
+    is $excerpt, q{Lead in md};
+}
+
+{
+    my $ja = $book->find_uri(qw/ja jadoc/);
+    my $ctx = $app->new_context(lang => 'ja');
+    is $ja->ctx_first_paragraph($ctx), q{日本語を含むドキュメントのテストです。<br />
+いろはにほへと ちりぬるを わかよたれそ つねならむ うゐのおくやま けふこえて あさきゆめみし ゑひもせすん<br />
+いろはにほへと ちりぬるを わかよたれそ つねならむ うゐのおくやま けふこえて あさきゆめみし ゑひもせすん<br />
+いろはにほへと ちりぬるを わかよたれそ つねならむ うゐのおくやま けふこえて あさきゆめみし ゑひもせすん<br />
+いろはにほへと ちりぬるを わかよたれそ つねならむ うゐのおくやま けふこえて あさきゆめみし ゑひもせすん<br />
+いろはにほへと ちりぬるを わかよたれそ つねならむ うゐのおくやま けふこえて あさきゆめみし ゑひもせすん<br />};
+    is $ja->ctx_excerpt($ctx), q{日本語を含むドキュメントのテストです。 いろはにほへと ちりぬるを わかよたれそ つねならむ うゐのおくやま けふこえて あさきゆめみし ゑひもせすん いろはにほへと ちりぬるを わかよたれそ つねならむ うゐのおくやま けふこえて あさきゆめみし ゑひもせすん いろはにほへと ちりぬるを わかよたれそ つねならむ うゐのおくやま けふこえて あさきゆめみし ゑひもせすん いろはにほへと ちりぬる...};
+}
 
 done_testing;

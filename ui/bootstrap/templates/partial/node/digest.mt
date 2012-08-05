@@ -16,7 +16,7 @@
         <? } ?>
     </h2>
     <? unless ( $nolead ) { ?>
-        <p class="docs-lead"><?= raw($node->ctx_lead($ctx)); ?></p>
+        <p class="docs-lead"><?= raw($node->ctx_excerpt($ctx)); ?></p>
     <? } ?>
     <div class="docs-sitemap"></div>
 </div>

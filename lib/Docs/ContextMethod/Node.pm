@@ -141,8 +141,56 @@ sub author_email_serial {
     my $ctx = shift;
 
     my $email = $node->ctx_author_email($ctx);
-    print STDERR "$email\n";
     md5_hex($email);
+}
+
+sub first_paragraph {
+    my $node = shift;
+    my $ctx = shift;
+
+    my $fp = $node->ctx_stash($ctx, 'first_paragraph');
+    return $fp if defined $fp;
+
+    $fp = '';
+    my $body = $node->ctx_body($ctx);
+    if ( $body =~ m!<p(\s+[^>]*|\s*)>(.+?)</p>!is ) {
+        $fp = $2;
+    }
+
+    $node->ctx_stash($ctx, 'first_paragraph', $fp);
+    $fp;
+}
+
+sub excerpt {
+    my $node = shift;
+    my $ctx = shift;
+
+    my $excerpt = $node->ctx_stash($ctx, 'excerpt');
+    return $excerpt if $excerpt;
+
+    $excerpt = $node->ctx_lead($ctx)
+        || $node->ctx_first_paragraph($ctx)
+        || '';
+
+    # Flatten
+    $excerpt =~ s!<[^>]+>!!isg;
+    $excerpt =~ s!\s+! !isg;
+
+    # Length or words
+    my $leader = $node->metadata->ctx_cascade_find($ctx, qw/excerpt_leader/)->as_scalar || '...';
+    my $len = length($excerpt);
+    if ( my $length = $node->metadata->ctx_cascade_find($ctx, qw/excerpt_length/)->as_scalar ) {
+        $length = int($length);
+        $excerpt = substr($excerpt, 0, $length);
+        $excerpt .= $leader if length($excerpt) < $len;
+    } elsif ( my $words = $node->metadata->ctx_cascade_find($ctx, qw/excerpt_words/)->as_scalar ) {
+        $words = int($words);
+        $excerpt = join( ' ', grep { $_ } (split /\s+/, $excerpt)[0..$words] );
+        $excerpt .= $leader if length($excerpt) < $len;
+    }
+
+    $node->ctx_stash($ctx, 'excerpt', $excerpt);
+    $excerpt;
 }
 
 sub lead {

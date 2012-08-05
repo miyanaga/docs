@@ -10,29 +10,31 @@
     margin-left: 0px;
 }
 
-#docs-quick-search .dropdown-menu {
-    min-width: 280px;
+.docs-quick-search .dropdown-menu {
+    min-width: 480px;
     max-width: 100%;
     height: auto;
 }
 
-#docs-quick-search .dropdown-menu li a {
+.docs-quick-search .dropdown-menu li a {
     padding-top: 6px;
     padding-bottom: 6px;
     border-bottom: 1px dashed #CCC;
 }
 
-#docs-quick-search .dropdown-menu li:last-child a {
+.docs-quick-search .dropdown-menu li:last-child a {
     border-bottom: none;
 }
 
-#docs-quick-search .dropdown-menu li a h4 {
+.docs-quick-search .dropdown-menu li a h4,
+.docs-quick-search .dropdown-menu li a div
+{
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-#docs-quick-search .dropdown-menu li a h4 small {
+.docs-quick-search .dropdown-menu li a h4 small {
     display: inline-block;
     max-width: 25%;
     white-space: nowrap;

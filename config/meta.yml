@@ -9,3 +9,5 @@ tag_group_classes:
 copyright: %Y <a href="http://www.ideamans.com/">ideaman's Inc.</a>
 lead_formatter: md
 title: Docs
+excerpt_length.ja: 200
+excerpt_words: 40

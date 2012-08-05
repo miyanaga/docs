@@ -6,7 +6,7 @@
 <? if ($result) { ?>
     <? for my $node ( @{$result->data} ) { ?>
         <? my $parent_title = $node->parent? $node->parent->ctx_title($ctx): ''; ?>
-        <li>
+        <li class="docs-node">
             <a href="<?= $node->uri_path ?>">
                 <h4>
                     <? if ($parent_title) { ?>
@@ -14,7 +14,7 @@
                     <? } ?>
                     <?= $node->ctx_title($ctx) ?>
                 </h4>
-                <? if ( my $lead = $node->ctx_lead($ctx) ) { ?>
+                <? if ( my $lead = $node->ctx_excerpt($ctx) ) { ?>
                     <div><?= $lead ?></div>
                 <? } ?>
             </a>
