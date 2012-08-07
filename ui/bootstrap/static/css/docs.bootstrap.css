@@ -169,10 +169,13 @@ article.docs-node section h4 {
     margin-bottom: 2px;
 }
 
-article.docs-node .docs-node-footer .docs-node-author-avatar img {
+article.docs-node .docs-node-footer .docs-node-author-gravatar img {
     margin-left: 8px;
+    display: none;
 }
 
+.tooltip { font-size: 100%; }
+.tooltip * { text-align: justify !important; }
 
 @media screen {
     .docs-breadcrumb

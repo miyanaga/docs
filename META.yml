@@ -35,9 +35,10 @@ requires:
   Tatsumaki::Handler: 0
   Text::Markdown: 0
   Text::MicroTemplate::Extended: 0
+  Twiggy
   URI::Escape: 0
   YAML::Syck: 0
   perl: 5.12.4
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.55
+version: 0.60

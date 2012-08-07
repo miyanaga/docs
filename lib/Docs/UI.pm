@@ -35,7 +35,6 @@ sub ctx_render {
     my $self = shift;
     my $ctx = shift;
     my $file = shift;
-    my %args = @_;
 
     my $helper = $ctx->new_helper;
     my $mt = Text::MicroTemplate::Extended->new(
@@ -43,7 +42,7 @@ sub ctx_render {
         template_args => { ctx => $ctx, helper => $helper },
     );
 
-    $mt->render($file, %args);
+    $mt->render($file, @_);
 }
 
 sub raw { Docs::UI::Helper->raw(@_); }

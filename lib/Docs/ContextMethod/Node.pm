@@ -212,15 +212,6 @@ sub lead {
     my $lead = $node->ctx_stash($ctx, 'lead');
     return $lead if defined($lead);
 
-    unless ($lead = $node->metadata->ctx_find($ctx, 'lead')->as_scalar ) {
-        #my $body = $node->ctx_body($ctx);
-        #if ( $body =~ /^(.*)<h1/is ) {
-        #    $lead = $1;
-        #} else {
-        #    $lead = '';
-        #}
-    }
-
     $node->ctx_stash($ctx, 'lead', $lead);
     $lead;
 }
@@ -305,6 +296,20 @@ sub html {
             $result = $helper->link_to_tag($tag) || $result;
         }
         $result;
+    }!iegs;
+
+    # docs:module
+    $body =~ s!<docs:(module)\s+([^>])>(.*?)</docs:\1>!{
+        my $app = Docs::app();
+        my $template = 'modules/' . $2;
+        my $yaml = $3;
+        try {
+            my $variant = Sweets::Variant->new;
+            $variant->from_yaml($yaml);
+            $app->ui->ctx_render($ctx, $variant->raw)->as_string;
+        } catch {
+            'docs:module error : ' . $_;
+        }
     }!iegs;
 
     $body;

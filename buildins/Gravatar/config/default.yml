@@ -1,0 +1,11 @@
+id: Gravatar
+context_methods:
+    gravatar.node.author_gravatar:
+        package: Docs::Model::Node
+        method: author_gravatar
+        code: Docs::Component::Gravatar::ContextMethod::author_gravatar
+ui:
+    helper_methods:
+        gravatar.node_author_gravatar:
+            method: node_author_gravatar
+            code: Docs::Component::Gravatar::HelperMethod::node_author_gravatar

@@ -16,6 +16,7 @@ requires 'Tatsumaki::Application' => '';
 requires 'Tatsumaki::Handler' => '';
 requires 'Text::Markdown' => '';
 requires 'Text::MicroTemplate::Extended' => '';
+requires 'Twiggy' => '';
 requires 'URI::Escape' => '';
 requires 'YAML::Syck' => '';
 requires 'FindBin::libs' => '';

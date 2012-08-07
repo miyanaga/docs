@@ -102,4 +102,14 @@ my $app = Docs::app(books_path => 't/books');
     is $helper->facebook_comment_form, '';
 }
 
+{
+    my $node = $app->books->path_find('/example/en');
+    ok $node;
+
+    my $ctx = $app->new_context(lang => 'en', node => $node);
+    my $helper = $ctx->new_helper;
+
+    is $helper->node_author_gravatar($node), q{<img class="docs-author-gravatar" src="http://www.gravatar.com/avatar/53ea23014763c68cf72d3d3e65dc0dd6?s=48&amp;d=404">};
+}
+
 done_testing;

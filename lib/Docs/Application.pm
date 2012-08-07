@@ -16,6 +16,7 @@ use Docs::Context;
 use Docs::ContextMethod;
 use Docs::UI;
 use Docs::Model::Language;
+use Docs::Application::Static;
 
 has app_path => ( is => 'ro', isa => 'Str', required => 1 );
 has books_path => ( is => 'ro', isa => 'Str', lazy => 1, default => sub {
@@ -193,10 +194,10 @@ sub compile_psgi_app {
         roots => $self->ui->static_paths,
     );
 
-    $app = Plack::Middleware::Static->wrap(
+    $app = Docs::Application::Static->wrap(
         $app,
-        path => sub { s/^\/(?:books\/)/$1||''/e },
-        root => 'private/books',
+        application => $self,
+        path => qr//,
     );
 
     $app;

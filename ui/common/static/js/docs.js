@@ -208,37 +208,19 @@
         });
     };
 
-    // Gravator
-    $.fn.docsGravatar = function(options) {
+    // Avatar
+    $.fn.docsAvatar = function(options) {
         var defaults = {
-            base: 'http://www.gravatar.com/avatar/',
-            s: 48,
-            d: '404',
-            // complete: function(img)
+            load: function() {
+                console.log('loaded');
+                $(this).show();
+            }
         };
         var opts = $.extend(defaults, options);
 
         return this.each(function() {
-            var container = this;
-            if (!opts.complete) return;
-
-            var $this = $(this);
-            var serial = $this.attr('data-email-serial');
-            if (!serial) return;
-
-            var param = {};
-            for (var p in opts) {
-                if (typeof p == 'string' && p != 'base' && opts[p]) {
-                    param[p] = opts[p];
-                }
-            }
-
-            $.get(
-                opts.base + serial,
-                param
-            ).success(function() {
-                opts.complete.call(container, this.url);
-            });
+            var src = $(this).attr('data-gravatar-src');
+            $(this).load(opts.load).attr('src', src);
         });
     };
 

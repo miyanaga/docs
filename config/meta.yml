@@ -11,3 +11,5 @@ lead_formatter: md
 title: Docs
 excerpt_length.ja: 200
 excerpt_words: 40
+gravatar:
+    url: http://www.gravatar.com/avatar/%s?s=48&d=404

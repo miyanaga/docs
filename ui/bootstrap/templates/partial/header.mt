@@ -1,8 +1,17 @@
+? my $books = Docs::app()->books;
+? my $node = $ctx->node;
+? my $book = $node? $node->book: undef;
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title><? block 'html_title' => sub { }?></title>
+    <title><? block 'html_title' => sub {
+      $node && $book && $node != $book
+          ? $node->ctx_title($ctx) . ' | ' . $book->ctx_title($ctx)
+          : $book
+              ? $book->ctx_title($ctx)
+              : $books->ctx_title($ctx);
+    }?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="<?= $ctx->stash_or('html_description', '', 1) ?>">
     <meta name="author" content="<?= $ctx->stash_or('html_author', '', 1) ?>">
@@ -47,7 +56,9 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <? block brand => sub { ?><a class="brand" href="#">BRAND</a><? } ?>
+          <? block brand => sub {
+                raw($helper->link_to_node($book || $books, class => 'brand'));
+          } ?>
           <? block global_header => sub {} ?>
           <div class="nav-collapse">
             <ul class="nav">

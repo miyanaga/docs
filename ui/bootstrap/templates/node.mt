@@ -47,9 +47,6 @@
 ? };
 
 ? block html_head => sub {
-    <? if ($folder) { ?>
-    <base href="<?= $folder->ctx_base_href($ctx) ?>/">
-    <? } ?>
 ? };
 
 ? block content => sub {

@@ -478,4 +478,12 @@ The quick brown fox jumps over the lazy dog<br />};
     is $ja->ctx_excerpt($ctx), q{日本語を含むドキュメントのテストです。 いろはにほへと ちりぬるを わかよたれそ つねならむ うゐのおくやま けふこえて あさきゆめみし ゑひもせすん いろはにほへと ちりぬるを わかよたれそ つねならむ うゐのおくやま けふこえて あさきゆめみし ゑひもせすん いろはにほへと ちりぬるを わかよたれそ つねならむ うゐのおくやま けふこえて あさきゆめみし ゑひもせすん いろはにほへと ちりぬる...};
 }
 
+{
+    my $node = $app->books->path_find('/example/en');
+    ok $node;
+
+    my $ctx = $app->new_context(lang => 'en', node => $node);
+    is $node->ctx_author_gravatar($ctx), q{http://www.gravatar.com/avatar/53ea23014763c68cf72d3d3e65dc0dd6?s=48&d=404};
+}
+
 done_testing;

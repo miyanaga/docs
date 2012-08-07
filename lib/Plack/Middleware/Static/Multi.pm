@@ -1,10 +1,10 @@
 package Plack::Middleware::Static::Multi;
 use strict;
 use warnings;
-use parent qw/Plack::Middleware/;
+use parent qw/Plack::Middleware::Static/;
 use Plack::App::File;
 
-use Plack::Util::Accessor qw( path roots encoding pass_through );
+use Plack::Util::Accessor qw( roots );
 
 sub call {
     my $self = shift;

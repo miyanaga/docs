@@ -66,7 +66,7 @@
                 $li.find('a').attr('href', '#' + anchor).text(' ' + title).prepend($('<i class="icon-share-alt">'));
                 $(this).append($li);
                 if ( count > 1 ) $(this).show();
-            },
+            }
         };
         var opts = $.extend(defaults, options);
 
@@ -151,7 +151,7 @@
     $.fn.docsQuickSearcher = function(options) {
         var defaults = {
             textbox: '.keyword',
-            min_length: 2,
+            min_length: 2
             // cancel: function() {},
             // before: function() {},
             // after: function() {},
@@ -247,11 +247,7 @@ jQuery(function() {
     $('.docs-quick-search').docsQuickSearcher();
 
     // Gravator
-    $('.docs-node-footer .docs-node-author-avatar').docsGravatar({
-        complete: function(url) {
-            $(this).append($('<img class="avatar">').attr('src', url));
-        }
-    });
+    $('.docs-node-footer .docs-node-author-gravatar img').docsAvatar();
 
     // Pretty print
     if(window.prettyPrint) {
