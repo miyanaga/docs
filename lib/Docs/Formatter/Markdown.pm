@@ -20,7 +20,7 @@ sub format {
     my ( $source ) = @_;
 
     # Remove header comment.
-    $source =~ s/^\s*<!--(.*?)-->\n*//s;
+    $source = $self->SUPER::format($source);
 
     $self->markdown->markdown($source);
 }

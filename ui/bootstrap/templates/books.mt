@@ -1,10 +1,6 @@
 ? extends 'layout/one-column';
 ? my $document = $ctx->books;
 
-? block brand => sub {
-    <?= raw($helper->link_to_node($ctx->books, class => 'brand')); ?>
-? }
-
 ? block content => sub {
 ?    if ( my $lead = $ctx->books->ctx_lead($ctx) ) {
 <p><?= raw($lead); ?></p>

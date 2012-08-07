@@ -81,6 +81,7 @@ sub has_node_in_path {
 
     # Ignore last index
     pop @paths if $paths[-1] && $paths[-1] eq 'index';
+    return 0 if scalar @paths <= 2;
 
     $node->is_in_uri_path(@paths);
 }

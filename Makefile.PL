@@ -20,6 +20,7 @@ requires 'Twiggy' => '';
 requires 'URI::Escape' => '';
 requires 'YAML::Syck' => '';
 requires 'FindBin::libs' => '';
+requires 'Sweets' => '0.33';
 
 build_requires 'Test::More';
 test_requires 'Test::Requires';

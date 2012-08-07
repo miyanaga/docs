@@ -5,10 +5,6 @@
 ? my $global_nav_limit = Docs::app()->config->cascade_find(qw/ui bootstrap global_nav_limit/)->as_scalar;
 ? $global_nav_limit = 5 unless defined $global_nav_limit;
 
-? block brand => sub {
-    <?= raw($helper->link_to_node($ctx->book, class => 'brand')); ?>
-? };
-
 ? block global_primary_nav => sub {
     <? my @menus = $ctx->book->ctx_children($ctx); ?>
     <? my @opened = grep { $_ } map { shift @menus } (1..$global_nav_limit) ?>

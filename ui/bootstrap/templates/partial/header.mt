@@ -58,7 +58,7 @@
             <span class="icon-bar"></span>
           </a>
           <? block brand => sub {
-                raw($helper->link_to_node($book || $books, class => 'brand'));
+              raw($helper->link_to_node($book || $books, class => 'brand'));
           } ?>
           <? block global_header => sub {} ?>
           <div class="nav-collapse">
@@ -77,5 +77,5 @@
       </div>
     </div>
 
-    <div class="container-fluid">
+    <div id="main" class="container-fluid">
       <div class="row-fluid">

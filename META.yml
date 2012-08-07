@@ -31,6 +31,7 @@ requires:
   Plack::App::File: 0
   Plack::Middleware: 0
   Plack::Util::Accessor: 0
+  Sweets: 0.33
   Tatsumaki::Application: 0
   Tatsumaki::Handler: 0
   Text::Markdown: 0
@@ -41,4 +42,4 @@ requires:
   perl: 5.12.4
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.60
+version: 0.61

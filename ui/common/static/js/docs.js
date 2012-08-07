@@ -30,6 +30,11 @@
 
         $.get(url, param, function(data) {
             $el.empty().append($(data)).attr('data-ajax-loaded', 'loaded');
+            if ( opts.after ) {
+                $el.each(function() {
+                    opts.after.call(this);
+                });
+            }
         }).complete(function() {
             $el.docsStopLoading();
         });
@@ -212,7 +217,6 @@
     $.fn.docsAvatar = function(options) {
         var defaults = {
             load: function() {
-                console.log('loaded');
                 $(this).show();
             }
         };
@@ -223,6 +227,8 @@
             $(this).load(opts.load).attr('src', src);
         });
     };
+
+    $.fn.docsTagcloud = function() { /* Override in each UI */ };
 
 })(jQuery);
 

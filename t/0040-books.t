@@ -139,6 +139,22 @@ my $ja = $book->find_uri('ja');
 }
 
 {
+    my $ctx = $app->new_context(lang => 'en');
+    my $javadoc = $en->find_uri(qw/meta javadoc/);
+    ok $javadoc;
+
+    is $javadoc->ctx_lead($ctx), 'Lead in Javadoc';
+    is $javadoc->ctx_body($ctx), '<p>Body in Javasoc</p>
+';
+
+    $ctx = $app->new_context(lang => 'ja');
+
+    is $javadoc->ctx_lead($ctx), 'Javadocのリード文';
+    is $javadoc->ctx_body($ctx), '<p>Body in Javasoc</p>
+';
+}
+
+{
     my $undef = $en->find_uri(qw/not found/);
     is $undef, undef;
 }

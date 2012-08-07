@@ -34,7 +34,12 @@
 
                 if ($pane.hasClass('docs-ajax-tab')) {
                     $tab.bind('shown', function() {
-                        $.Docs.elementAjax({ element: $pane });
+                        $.Docs.elementAjax({ element: $pane, after: function() {
+                            if ( $pane.attr('onshow') ) {
+                                var onshown = $pane.attr('onshow');
+                                eval(onshown);
+                            }
+                        } });
                     });
                 }
 
@@ -195,7 +200,19 @@
             });
         });
 
-    }
+    };
+
+    // Tag cloud
+    $.fn.docsTagcloud = function() {
+        return this.each(function() {
+            $(this).find('*[rel=tooltip]').tooltip({
+                title: function() {
+                    return $(this).attr('data-node-count');
+                }
+            });
+        });
+    };
+
 })(jQuery);
 
 jQuery(function() {
