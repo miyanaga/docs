@@ -67,6 +67,9 @@ sub path_find {
         $node = $self->books->path_find( substr( $path, 1 ) );
     } elsif ( $head eq '@' ) {
         $node = $self->books->get_node_by_id( substr( $path, 1 ) );
+    } elsif ( substr( $path, 0, 2 ) eq '~/' ) {
+        my $base = $self->book || $self;
+        $node = $base->path_find( substr( $path , 2 ) );
     } else {
         my @path = grep { $_ } split '/', $path;
         pop @path if $path[-1] && $path[-1] eq 'index';

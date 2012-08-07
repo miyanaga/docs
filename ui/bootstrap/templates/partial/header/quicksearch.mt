@@ -2,7 +2,7 @@
 
 <? if ($book) { ?>
 <li class="dropdown docs-quick-search" data-node-url="<?= $book->uri_path ?>">
-    <form class="navbar-search form-inline pull-right" name="quick-sarch" action="<?= $book->uri_path ?>" method="GET">
+    <form class="navbar-form pull-left" name="quick-sarch" action="<?= $book->uri_path ?>" method="GET">
         <input type="hidden" name="action" value="search">
         <input type="text" class="keyword" name="q" data-toggle="dropdown" placeholder="Quick Search">
     </form>

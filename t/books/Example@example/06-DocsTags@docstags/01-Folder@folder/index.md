@@ -5,6 +5,7 @@
 
 <docs:node /example/en>
 <docs:link /example/en />
+<docs:node ~/en />
 <docs:node .. />
 <docs:node ../folder />
 <docs:node ../../en />

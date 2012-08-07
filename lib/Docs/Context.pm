@@ -36,7 +36,8 @@ has is_admin => ( is => 'rw', isa => 'Bool', lazy => 1, default => sub {
     my $app = Docs->app;
 
     my $networks = $app->config->cascade_find(qw/admin_networks/)->as_hash || return 1;
-    while ( my ( $location, $network ) = each %$networks ) {
+    for my $location ( keys %$networks ) {
+        my $network = $networks->{$location} || next;
         my $subnets = $app->config->cascade_find( 'admin_networks', $location, 'allow_from' )->as_array || next;
         next unless @$subnets;
         my $headers = $app->config->cascade_find( 'admin_networks', $location, 'http_header' )->as_array;

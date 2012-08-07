@@ -403,6 +403,7 @@ my $ja = $book->find_uri('ja');
     is $html, <<'HTML';
 <p><a href="/example/en"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
 <a href="/example/en"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
+<a href="/example/en"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
 <a href="/example/docstags"><span class="docs-numbering">6.</span> <span class="docs-node-title">DocsTags</span></a>
 <a href="/example/docstags/folder"><span class="docs-numbering">6.1.</span> <span class="docs-node-title">Folder</span></a>
 <a href="/example/en"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>

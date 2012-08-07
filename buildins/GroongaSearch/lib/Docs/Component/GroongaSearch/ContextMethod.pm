@@ -108,7 +108,7 @@ sub groonga_load {
     my $node = shift;
     my $ctx = shift;
     return if $node->ctx_hidden($ctx);
-    
+
     my $book = $node->book || Carp::confess('book not found');
     my @tags = $node->ctx_tags_include_body($ctx);
 
@@ -259,18 +259,28 @@ sub search {
         $groonga_res = _keyword_search( $node, $ctx, $app, $groonga, $books, $book, $keyword, $pager_req );
     }
 
-    my @records = map {
+    my $hit = $groonga_res->hit || 0;
+    my @records = grep { $_ } map {
         my @path = grep { $_ } split '/', $_->{_key};
-        my $node = $books->find_uri(@path) || return;
-        $node->ctx_stash_score( $ctx, $_->{_score} );
-        $node->ctx_stash_title( $ctx, $_->{title} );
-        $node->ctx_stash_text( $ctx, $_->{text} );
-        $node->ctx_stash_headlines( $ctx, $_->{h1} );
+        if ( my $node = $books->find_uri(@path) ) {
+            if ( $node->ctx_hidden($ctx) ) {
+                $hit--;
+                undef;
+            } else {
+                $node->ctx_stash_score( $ctx, $_->{_score} );
+                $node->ctx_stash_title( $ctx, $_->{title} );
+                $node->ctx_stash_text( $ctx, $_->{text} );
+                $node->ctx_stash_headlines( $ctx, $_->{h1} );
 
-        $node;
+                $node;
+            }
+        } else {
+            $hit--;
+            undef;
+        }
     } @{$groonga_res->hash_array};
 
-    $pager_res->count($groonga_res->hit);
+    $pager_res->count($hit);
     $pager_res->data(\@records);
 
     $pager_res;

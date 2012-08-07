@@ -15,6 +15,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="<?= $ctx->stash_or('html_description', '', 1) ?>">
     <meta name="author" content="<?= $ctx->stash_or('html_author', '', 1) ?>">
+    <meta http-equiv="X-UA-Compatible" content="IE=IE7" />
 
     <!-- Le styles -->
     <link href="/static/bootstrap/css/bootstrap.css" rel="stylesheet">
@@ -63,19 +64,14 @@
           <div class="nav-collapse">
             <ul class="nav">
               <? block global_primary_nav => sub {} ?>
-            </ul>
-            <? if ( $ctx->is_admin ) { ?>
-            <ul class="nav pull-right">
-              <? block global_teritiary_nav => sub { ?>
+              <? if ( $ctx->is_admin ) { ?>
+              <li><a href="#" class="docs-rebuilder">
+                <i class="icon-refresh icon-white"></i>
+                <span>Rebuild</span></a>
+              </li>
               <? } ?>
-                <li><a href="#" class="docs-rebuilder">
-                  <i class="icon-refresh icon-white"></i>
-                  <span>Rebuild</span></a>
-                </li>
-
               <? block global_secondary_nav => sub {} ?>
             </ul>
-            <? } ?>
           </div><!--/.nav-collapse -->
         </div>
       </div>

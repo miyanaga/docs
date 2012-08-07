@@ -39,9 +39,9 @@ sub sitemap {
 
     my %args = ( node => $self->node );
     if ( my $active = $self->request->parameters->get('active') ) {
-        my $active = $ctx->books->path_find($active);
-        $active = $active->parent if $active->is_index;
-        $args{active} = $active;
+        my $node = $ctx->books->path_find($active);
+        $node = $node->parent if $node->is_index;
+        $args{active} = $node;
     }
     $self->render('partial/node/sitemap', %args );
 }

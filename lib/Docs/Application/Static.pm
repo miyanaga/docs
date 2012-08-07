@@ -23,9 +23,18 @@ sub _handle_static {
     my @paths = File::Spec->splitdir($path);
 
     my $file = pop @paths || return;
+
+    # Deny file starts with period(.) and document
+    return if $file =~ /^\./;
+    if ( $file =~ /\.(.+)/ ) {
+        return if $self->application->formatter($1);
+    }
+
+    # Detect the folder
     my $node = $self->application->books->find_uri(@paths) || return;
     return unless $node->is_folder;
 
+    # Build file path
     $path = File::Spec->catdir( $node->file_path, $file );
     return unless -f $path;
 
@@ -36,4 +45,3 @@ sub _handle_static {
 
 1;
 __END__
-

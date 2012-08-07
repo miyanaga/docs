@@ -35,7 +35,7 @@ requires:
   Tatsumaki::Handler: 0
   Text::Markdown: 0
   Text::MicroTemplate::Extended: 0
-  Twiggy
+  Twiggy: 0
   URI::Escape: 0
   YAML::Syck: 0
   perl: 5.12.4

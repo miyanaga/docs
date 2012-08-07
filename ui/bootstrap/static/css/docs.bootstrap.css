@@ -1,3 +1,7 @@
+body {
+    font-family: "ヒラギノ角ゴ Pro W3","Hiragino Kaku Gothic Pro","メイリオ",Meiryo,Arial,Verdana,"ＭＳ Ｐゴシック",sans-serif;
+}
+
 #nav-opener {
     float: left;
 }
@@ -144,6 +148,10 @@ article.docs-node section h1,
     margin-top: 24px;
     margin-bottom: 8px;
     border-bottom: 1px dashed #ccc;
+}
+
+article.docs-node section p {
+    line-height: 1.7;
 }
 
 article.docs-node section h1:first-child {

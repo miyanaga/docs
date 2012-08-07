@@ -212,6 +212,8 @@ sub lead {
     my $lead = $node->ctx_stash($ctx, 'lead');
     return $lead if defined($lead);
 
+    $lead = $node->metadata->ctx_find($ctx, 'lead')->as_scalar || '';
+
     $node->ctx_stash($ctx, 'lead', $lead);
     $lead;
 }

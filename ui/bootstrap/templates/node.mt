@@ -30,11 +30,8 @@
     <? } ?>
 
     <?= include('partial/header/quicksearch'); ?>
-? };
-
-? block global_secondary_nav => sub {
     <?= include('partial/header/books'); ?>
-? }
+? };
 
 ? block global_header => sub {
 <ul class="nav pull-right">
