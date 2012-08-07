@@ -197,7 +197,7 @@ sub compile_psgi_app {
     $app = Docs::Application::Static->wrap(
         $app,
         application => $self,
-        path => qr//,
+        path => sub { !/^\./ },
     );
 
     $app;
