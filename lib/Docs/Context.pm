@@ -41,7 +41,7 @@ has is_admin => ( is => 'rw', isa => 'Bool', lazy => 1, default => sub {
         my $subnets = $app->config->cascade_find( 'admin_networks', $location, 'allow_from' )->as_array || next;
         next unless @$subnets;
         my $headers = $app->config->cascade_find( 'admin_networks', $location, 'http_header' )->as_array;
-        push @$headers, qw/REMOTE_ADDR X-Real-IP/ unless @$headers;
+        push @$headers, qw/REMOTE_ADDR HTTP_X_FORWARDED_FOR HTTP_X_REAL_IP/ unless @$headers;
 
         for my $header ( @$headers ) {
             my $value = $self->handler->request->env->{$header}
