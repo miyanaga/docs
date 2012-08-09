@@ -48,7 +48,11 @@ sub file_name { shift->name('file', @_) }
 sub uri_path { shift->build_path('uri', '/') }
 sub normalized_uri_path {
     my $self = shift;
-    $self->is_index? $self->folder->uri_path: $self->uri_path;
+    $self->is_folder
+        ? $self->uri_path . '/'
+        : $self->is_index
+            ? $self->folder->uri_path . '/'
+            : $self->uri_path;
 }
 sub file_path { shift->build_path('file', '/') }
 

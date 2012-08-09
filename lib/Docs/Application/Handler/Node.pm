@@ -13,6 +13,7 @@ has node => ( is => 'ro', isa => 'Docs::Model::Node', lazy_build => 1, builder =
     my $ctx = $self->context;
     my $app = Docs::app();
 
+    my $path = $self->request->path_info;
     my $node = $app->books->path_find($self->request->path_info || '');
     $node || Tatsumaki::Error::HTTP->throw(404, 'Not Found');
 
@@ -28,6 +29,13 @@ sub get {
     # Dispatch action
     my $action_result = $self->dispatch_action;
     return $action_result if defined($action_result);
+
+    # Refine path
+    if ( $node->normalized_uri_path ne $self->request->path_info ) {
+        $self->response->header('Location', $node->normalized_uri_path);
+        $self->response->status(301);
+        return;
+    }
 
     my $template = $node->ctx_template($ctx);
     $self->render($template);

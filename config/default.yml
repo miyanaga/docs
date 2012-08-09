@@ -54,10 +54,6 @@ search:
     per_page: 10
     quick_per_page: 10
 context_methods:
-    core.node.url:
-        package: Docs::Model::Node
-        method: url
-        code: Docs::ContextMethod::Node::url
     core.node.order:
         package: Docs::Model::Node
         method: order

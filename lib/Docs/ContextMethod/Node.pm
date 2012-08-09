@@ -10,13 +10,6 @@ use Docs::Model::Node::Headline;
 use Digest::MD5 qw(md5_hex);
 use HTML::Entities;
 
-sub url {
-    my $node = shift;
-    my $ctx = shift;
-
-    $node->uri_path;
-}
-
 sub order {
     my $node = shift;
     my $ctx = shift;
@@ -263,9 +256,6 @@ sub body {
         lc($1) eq 'pre'? qq{<pre$attr>$inner</pre>}: $inner;
     }!iegs;
 
-    #my $macro = $ctx->new_macro( template => $source );
-    #$body = $macro->render || $source;
-
     $body = $node->formatter->format($source);
 
     $node->ctx_stash($ctx, 'body', $body || '');
@@ -298,20 +288,6 @@ sub html {
             $result = $helper->link_to_tag($tag) || $result;
         }
         $result;
-    }!iegs;
-
-    # docs:module
-    $body =~ s!<docs:(module)\s+([^>])>(.*?)</docs:\1>!{
-        my $app = Docs::app();
-        my $template = 'modules/' . $2;
-        my $yaml = $3;
-        try {
-            my $variant = Sweets::Variant->new;
-            $variant->from_yaml($yaml);
-            $app->ui->ctx_render($ctx, $variant->raw)->as_string;
-        } catch {
-            'docs:module error : ' . $_;
-        }
     }!iegs;
 
     $body;

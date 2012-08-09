@@ -417,18 +417,18 @@ my $ja = $book->find_uri('ja');
     my $html = $docstags->ctx_html($ctx);
 
     is $html, <<'HTML';
-<p><a href="/example/en"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
-<a href="/example/en"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
-<a href="/example/en"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
-<a href="/example/docstags"><span class="docs-numbering">6.</span> <span class="docs-node-title">DocsTags</span></a>
-<a href="/example/docstags/folder"><span class="docs-numbering">6.1.</span> <span class="docs-node-title">Folder</span></a>
-<a href="/example/en"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
-<a href="/example/en"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
+<p><a href="/example/en/"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
+<a href="/example/en/"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
+<a href="/example/en/"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
+<a href="/example/docstags/"><span class="docs-numbering">6.</span> <span class="docs-node-title">DocsTags</span></a>
+<a href="/example/docstags/folder/"><span class="docs-numbering">6.1.</span> <span class="docs-node-title">Folder</span></a>
+<a href="/example/en/"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
+<a href="/example/en/"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
 <a href="/example/en/formatters/mddoc"><span class="docs-numbering">1.1.2.</span> <span class="docs-node-title">MarkdownDocument</span></a>
 <a href="/example/en/formatters/htmldoc#anchor"><span class="docs-numbering">1.1.1.</span> <span class="docs-node-title">HTMLDocument</span></a>
-<a href="/example/docstags/folder"><span class="docs-numbering">6.1.</span> <span class="docs-node-title">Folder</span></a>
-<a class="label" href="/example?action=search&amp;q=tag%3ABODY%3ATAG1">TAG1</a>
-<a class="label" href="/example?action=search&amp;q=tag%3ABODY%3ATAG2">TAG2</a></p>
+<a href="/example/docstags/folder/"><span class="docs-numbering">6.1.</span> <span class="docs-node-title">Folder</span></a>
+<a class="label" href="/example/?action=search&amp;q=tag%3ABODY%3ATAG1">TAG1</a>
+<a class="label" href="/example/?action=search&amp;q=tag%3ABODY%3ATAG2">TAG2</a></p>
 HTML
 }
 

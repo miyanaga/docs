@@ -28,7 +28,7 @@ my $app = Docs::app(books_path => 't/books');
 
     my $helper = Docs::UI::Helper->new(context => $ctx);
 
-    is $helper->link_to_tag($tag), '<a class="label" href="/example?action=search&amp;q=tag%3ATAG">TAG</a>';
+    is $helper->link_to_tag($tag), '<a class="label" href="/example/?action=search&amp;q=tag%3ATAG">TAG</a>';
 }
 
 {
@@ -38,8 +38,8 @@ my $app = Docs::app(books_path => 't/books');
 
     my $helper = Docs::UI::Helper->new(context => $ctx);
 
-    is $helper->link_to_tag($tags[0]), '<a class="label label-info" href="/example?action=search&amp;q=tag%3AGROUP%3ATAG">TAG</a>';
-    is $helper->link_to_tag($tags[1]), '<a class="label" href="/example?action=search&amp;q=tag%3ANOCLASS%3ATAG">TAG</a>';
+    is $helper->link_to_tag($tags[0]), '<a class="label label-info" href="/example/?action=search&amp;q=tag%3AGROUP%3ATAG">TAG</a>';
+    is $helper->link_to_tag($tags[1]), '<a class="label" href="/example/?action=search&amp;q=tag%3ANOCLASS%3ATAG">TAG</a>';
 
     is $helper->link_to_tag($tags[1], nolink => 1), '<span class="label">TAG</span>';
 }

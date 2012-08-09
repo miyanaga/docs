@@ -53,7 +53,7 @@ sub set_node_by_id {
     my ( $node ) = @_;
 
     if ( $node->id ) {
-        $self->node_index->{$node->id} = $node->uri_path;
+        $self->node_index->{$node->id} = $node->normalized_uri_path;
     }
 }
 

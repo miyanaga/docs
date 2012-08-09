@@ -14,7 +14,7 @@ use Docs;
 
         my $app_id = $node->metadata->ctx_cascade_find($ctx, qw/facebook_comment app_id/)->as_scalar;
         my $posts = $node->metadata->ctx_cascade_find($ctx, qw/facebook_comment posts/)->as_scalar;
-        my $url = $node->uri_path;
+        my $url = $node->normalized_uri_path;
         my $hidden = $node->metadata->ctx_cascade_find($ctx, qw/facebook_comment hidden/)->as_scalar;
 
         ( $app_id, $posts, $url, $hidden );

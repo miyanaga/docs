@@ -20,7 +20,7 @@ sub node_action {
     $queries ||= {};
     $queries->{action} = $action;
 
-    $self->url( $node->uri_path, $queries, $hash );
+    $self->url( $node->normalized_uri_path, $queries, $hash );
 }
 
 no Any::Moose;
