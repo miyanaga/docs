@@ -30,6 +30,12 @@ sub link_to_node {
     $args{raw_attr}->{href} = $node->normalized_uri_path;
     $args{raw_attr}->{href} .= '#' . delete $args{hash} if $args{hash};
 
+    # Class
+    $args{class} ||= '';
+    $args{class} .= ' ' if $args{class};
+    $args{class} .= 'docs-node-link';
+    $args{class} .= ' docs-with-numbering' if $numbering;
+
     $self->element('a', %args);
 }
 

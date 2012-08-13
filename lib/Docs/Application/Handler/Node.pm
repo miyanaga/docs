@@ -21,6 +21,20 @@ has node => ( is => 'ro', isa => 'Docs::Model::Node', lazy_build => 1, builder =
     $node;
 });
 
+sub redirect {
+    my $self = shift;
+    my ( $url ) = @_;
+
+    $url ||= $self->node;
+    if ( ref $url && eval { $url->isa('Docs::Model::Node') } ) {
+        $url = $url->normalized_uri_path; # In the case of the argument is a node
+    }
+
+    $self->response->header('Location', $url);
+    $self->response->status(301);
+    return;
+}
+
 sub get {
     my $self = shift;
     my $ctx = $self->context;
@@ -30,11 +44,14 @@ sub get {
     my $action_result = $self->dispatch_action;
     return $action_result if defined($action_result);
 
+    # Switch cookie values like lang
+    if ( $ctx->to_cookies ) {
+        return $self->redirect($node);
+    }
+
     # Refine path
     if ( $node->normalized_uri_path ne $self->request->path_info ) {
-        $self->response->header('Location', $node->normalized_uri_path);
-        $self->response->status(301);
-        return;
+        return $self->redirect($node);
     }
 
     my $template = $node->ctx_template($ctx);

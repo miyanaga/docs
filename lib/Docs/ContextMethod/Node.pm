@@ -9,6 +9,11 @@ use Docs::Model::Node::Tag;
 use Docs::Model::Node::Headline;
 use Digest::MD5 qw(md5_hex);
 use HTML::Entities;
+use Sweets::Variant;
+use Sweets::Text::Xsv;
+use Sweets::Text::HTML::Attributes::Parser;
+use Text::MicroTemplate;
+use Data::Dumper::HTML;
 
 sub order {
     my $node = shift;
@@ -237,6 +242,61 @@ sub body_without_lead {
     $body;
 }
 
+{
+    sub expand_module {
+        my $node = shift;
+        my $ctx = shift;
+        my ( $attributes, $inner ) = @_;
+        my %params;
+
+        my $attrs = Sweets::Text::HTML::Attributes::Parser->new(
+            raw => $attributes,
+        );
+        $params{attributes} = $attrs;
+        my ( $file ) = $attrs->remove('') || $attrs->remove('file') || return '';
+        my ( $format ) = $attrs->remove('format') || $node->metadata->ctx_cascade_find($ctx, 'module', $file, 'default_format')->as_scalar || 'yaml';
+        my ( $dump ) = $attrs->remove('dump');
+
+        my $values;
+        $inner =~ s/^\s*\n//s;
+        $inner =~ s/\n\s*$//s;
+        if ( $format =~ /^([tcs])sv$/i ) {
+            my $xsv = Sweets::Text::Xsv->new(
+                separator => $1 eq 'c'
+                    ? ','
+                    : $1 eq 's'
+                        ? qr/\s+/
+                        : "\t",
+            );
+            $xsv->parse($inner);
+            $values = $xsv->rows;
+            $params{xsv} = $xsv;
+        } elsif ( $format =~ /^ya?ml$/i ) {
+            eval {
+                my $var = Sweets::Variant->from_yaml($inner);
+                $values = $var->raw;
+                $params{variant} = $var;
+            };
+        }
+
+        my $module = $ctx->new_module( $file );
+        my $result = '';
+        if ( $result = $module->render( $ctx, $node, $attrs->as_hash, $values ) ) {
+            $result = Text::MicroTemplate::encoded_string($result);
+            $result =~ s/\n\s+/\n/sg;
+        }
+
+        if ( $dump ) {
+            $result .= '<div class="docs-dumper">' . Data::Dumper::HTML::dumper_html(
+                '$attributes' => $attributes,
+                '$values' => $values,
+            ) . '</div>';
+        }
+
+        $result;
+    }
+}
+
 sub body {
     my $node = shift;
     my $ctx = shift;
@@ -249,11 +309,17 @@ sub body {
     # Language filter.
     $source =~ s|<docs:lang\s+([a-z]+)>\s*(.*?)\s*</docs:lang>|{$1 eq $ctx->language->key? $2: ''}|iges;
 
-    # docs:pre, docs:escape
-    $source =~ s!<docs:(pre)(\s+[^>]*|\s*)>(.*?)</docs:\1>!{
+    # docs:pre, module
+    $source =~ s!<docs:(pre|module)(\s+[^>]*|\s*)>(.*?)</docs:\1>!{
+        my $tag = lc($1);
         my $attr = $2;
-        my $inner = encode_entities($3, q{<>&"});
-        lc($1) eq 'pre'? qq{<pre$attr>$inner</pre>}: $inner;
+        my $inner = $3;
+        if ( $tag eq 'pre' ) {
+            $inner = encode_entities($inner, q{<>&"});
+            qq{<pre$attr>$inner</pre>};
+        } elsif ( $tag eq 'module' ) {
+            expand_module($node, $ctx, $attr, $inner);
+        }
     }!iegs;
 
     $body = $node->formatter->format($source);

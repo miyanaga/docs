@@ -28,6 +28,10 @@
     display: inline-block;
 }
 
+.docs-dumper {
+    font-family: monospace;
+}
+
 @media screen {
     .print {
         display: none !important;

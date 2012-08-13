@@ -26,7 +26,7 @@ my $book = $books->find_uri('example');
     is $book->naming->title, 'Example';
 
     my @children = values %{$book->children('uri')};
-    is scalar @children, 7;
+    is scalar @children, 8;
 }
 
 my $en = $book->find_uri('en');
@@ -417,16 +417,16 @@ my $ja = $book->find_uri('ja');
     my $html = $docstags->ctx_html($ctx);
 
     is $html, <<'HTML';
-<p><a href="/example/en/"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
-<a href="/example/en/"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
-<a href="/example/en/"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
-<a href="/example/docstags/"><span class="docs-numbering">6.</span> <span class="docs-node-title">DocsTags</span></a>
-<a href="/example/docstags/folder/"><span class="docs-numbering">6.1.</span> <span class="docs-node-title">Folder</span></a>
-<a href="/example/en/"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
-<a href="/example/en/"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
-<a href="/example/en/formatters/mddoc"><span class="docs-numbering">1.1.2.</span> <span class="docs-node-title">MarkdownDocument</span></a>
-<a href="/example/en/formatters/htmldoc#anchor"><span class="docs-numbering">1.1.1.</span> <span class="docs-node-title">HTMLDocument</span></a>
-<a href="/example/docstags/folder/"><span class="docs-numbering">6.1.</span> <span class="docs-node-title">Folder</span></a>
+<p><a class="docs-node-link docs-with-numbering" href="/example/en/"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
+<a class="docs-node-link docs-with-numbering" href="/example/en/"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
+<a class="docs-node-link docs-with-numbering" href="/example/en/"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
+<a class="docs-node-link docs-with-numbering" href="/example/docstags/"><span class="docs-numbering">6.</span> <span class="docs-node-title">DocsTags</span></a>
+<a class="docs-node-link docs-with-numbering" href="/example/docstags/folder/"><span class="docs-numbering">6.1.</span> <span class="docs-node-title">Folder</span></a>
+<a class="docs-node-link docs-with-numbering" href="/example/en/"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
+<a class="docs-node-link docs-with-numbering" href="/example/en/"><span class="docs-numbering">1.</span> <span class="docs-node-title">English</span></a>
+<a class="docs-node-link docs-with-numbering" href="/example/en/formatters/mddoc"><span class="docs-numbering">1.1.2.</span> <span class="docs-node-title">MarkdownDocument</span></a>
+<a class="docs-node-link docs-with-numbering" href="/example/en/formatters/htmldoc#anchor"><span class="docs-numbering">1.1.1.</span> <span class="docs-node-title">HTMLDocument</span></a>
+<a class="docs-node-link docs-with-numbering" href="/example/docstags/folder/"><span class="docs-numbering">6.1.</span> <span class="docs-node-title">Folder</span></a>
 <a class="label" href="/example/?action=search&amp;q=tag%3ABODY%3ATAG1">TAG1</a>
 <a class="label" href="/example/?action=search&amp;q=tag%3ABODY%3ATAG2">TAG2</a></p>
 HTML
@@ -501,6 +501,63 @@ The quick brown fox jumps over the lazy dog<br />};
 
     my $ctx = $app->new_context(lang => 'en', node => $node);
     is $node->ctx_author_gravatar($ctx), q{http://www.gravatar.com/avatar/53ea23014763c68cf72d3d3e65dc0dd6?s=48&d=404};
+}
+
+{
+    my $node = $app->books->path_find('/example/modules/table');
+    ok $node;
+
+    my $ctx = $app->new_context(lang => 'en', node => $node);
+    my $body = $node->ctx_body($ctx);
+    is $body, q{<table class="default-class" id="the-table">
+<th class="col1">head1</th>
+<th class="col2">head2</th>
+<th class="col3">head3</th>
+<td class="col1">value1-1</td>
+<td class="col2">value1-2</td>
+<td class="col3">value1-3</td>
+<td class="col1">value2-1</td>
+<td class="col2">value2-2</td>
+<td class="col3">value2-3</td>
+</table>
+
+<table class="table" id="the-table">
+<th class="col1">head1</th>
+<th class="col2">head2</th>
+<th class="col3">head3</th>
+<td class="col1">value1-1</td>
+<td class="col2">value1-2</td>
+<td class="col3">value1-3</td>
+<td class="col1">value2-1</td>
+<td class="col2">value2-2</td>
+<td class="col3">value2-3</td>
+</table>
+
+<table class="table" id="the-table">
+<th class="col1">head1</th>
+<th class="col2">head2</th>
+<th class="col3">head3</th>
+<td class="col1">value1-1</td>
+<td class="col2">value1-2</td>
+<td class="col3">value1-3</td>
+<td class="col1">value2-1</td>
+<td class="col2">value2-2</td>
+<td class="col3">value2-3</td>
+</table>
+
+<table class="table" id="the-table">
+<th class="col1">head1</th>
+<th class="col2">head2</th>
+<th class="col3">head3</th>
+<td class="col1">value1-1</td>
+<td class="col2">value1-2</td>
+<td class="col3">value1-3</td>
+<td class="col1">value2-1</td>
+<td class="col2">value2-2</td>
+<td class="col3">value2-3</td>
+</table>
+};
+
 }
 
 done_testing;

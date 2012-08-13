@@ -7,7 +7,7 @@ use parent qw(Sweets::Aspect::Stashable);
 use Any::Moose;
 use NetAddr::IP;
 use Docs::UI::Helper;
-use Docs::Model::Node::Macro;
+use Docs::UI::Module;
 
 has cookies_expires_days => ( is => 'rw', isa => 'Int', default => 365 );
 has cookieing => ( is => 'ro', isa => 'ArrayRef', default => sub { [qw/lang search_per_page navigation/] } );
@@ -18,7 +18,8 @@ has node => ( is => 'rw', isa => 'Docs::Model::Node', lazy_build => 1, builder =
     Docs::app()->books;
 });
 has handler => ( is => 'rw', isa => 'Docs::Application::Handler', trigger => sub {
-    shift->from_cookies;
+    my $self = shift;
+    $self->from_cookies;
 });
 has path_info => ( is => 'rw', isa => 'Str', default => '/' );
 has paths => ( is => 'rw', isa => 'ArrayRef', lazy_build => 1, builder => sub {
@@ -119,19 +120,24 @@ sub from_cookies {
 sub to_cookies {
     my $self = shift;
     my $handler = $self->handler || return;
-    my $cookies = $handler->response->cookies || return;
-    my $props = \@_ || $self->cookieing;
+    my $cookies = $handler->response->cookies || {};
+    my $props = @_? \@_: $self->cookieing;
 
+    my $count = 0;
     for my $prop ( @$props ) {
-        next unless eval { $self->can($prop) };
-
+        my $value = $handler->request->parameters->get($prop) || next;
+        $self->$prop($value) if $self->can($prop);
         my $name = "_$prop";
         $cookies->{$name} = {
-            value => $self->$prop,
+            value => $value,
             path => '/',
             expires => $self->cookies_expires_on,
         };
+        $count++;
     }
+    $handler->response->cookies($cookies);
+
+    $count;
 }
 
 sub new_helper {
@@ -144,13 +150,12 @@ sub new_helper {
     );
 }
 
-sub new_macro {
+sub new_module {
     my $self = shift;
-    my %args = @_;
+    my ( $file ) = @_;
 
-    Docs::Model::Node::Macro->new(
-        context => $self,
-        %args
+    Docs::UI::Module->new(
+        name => $file,
     );
 }
 

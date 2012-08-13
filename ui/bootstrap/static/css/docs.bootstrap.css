@@ -46,6 +46,15 @@
     text-overflow: ellipsis;
 }
 
+a.docs-node-link.docs-with-numbering span {
+    display: table-cell;
+}
+
+a.docs-node-link.docs-with-numbering span.docs-numbering {
+    display: table-cell;
+    padding-right: 4px;
+}
+
 ul.docs-nodes ul.docs-nodes {
     margin-left: 10px;
 }

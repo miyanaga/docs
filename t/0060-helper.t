@@ -14,8 +14,8 @@ my $app = Docs::app(books_path => 't/books');
 
     my $node = $app->books->path_find('/example/en/formatters/mddoc');
 
-    is $helper->link_to_node($node), '<a href="/example/en/formatters/mddoc"><span class="docs-numbering">1.1.2.</span> <span class="docs-node-title">MarkdownDocument</span></a>';
-    is $helper->link_to_node($node, nonumbering => 1), '<a href="/example/en/formatters/mddoc">MarkdownDocument</a>';
+    is $helper->link_to_node($node), '<a class="docs-node-link docs-with-numbering" href="/example/en/formatters/mddoc"><span class="docs-numbering">1.1.2.</span> <span class="docs-node-title">MarkdownDocument</span></a>';
+    is $helper->link_to_node($node, nonumbering => 1), '<a class="docs-node-link" href="/example/en/formatters/mddoc">MarkdownDocument</a>';
 
     is $helper->node_action($node, 'search', { q => '検索キーワード' }, 'HASH' ),
         '/example/en/formatters/mddoc?action=search&q=%E6%A4%9C%E7%B4%A2%E3%82%AD%E3%83%BC%E3%83%AF%E3%83%BC%E3%83%89#HASH';

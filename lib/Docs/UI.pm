@@ -4,8 +4,8 @@ use strict;
 use warnings;
 
 use Any::Moose;
-use Text::MicroTemplate::Extended;
 use Docs::UI::Helper;
+use parent 'Docs::Template';
 
 {
     sub _dir_paths_to {
@@ -24,10 +24,10 @@ has theme => ( is => 'ro', isa => 'Str', lazy_build => 1, builder => sub {
     my $app = Docs::app();
     $app->config->cascade_find(qw/ui theme/)->as_scalar || 'common';
 });
-has static_paths => ( is => 'ro', isa => 'ArrayRef', lazy_build => 1, builder => sub {
+has static_paths => ( is => 'ro', isa => 'ArrayRef', lazy => 1, default => sub {
     shift->_dir_paths_to('static');
 });
-has template_paths => ( is => 'ro', isa => 'ArrayRef', lazy_build => 1, builder => sub {
+has include_paths => ( is => 'ro', isa => 'ArrayRef', lazy => 1, default => sub {
     shift->_dir_paths_to('templates');
 });
 
@@ -35,19 +35,8 @@ sub ctx_render {
     my $self = shift;
     my $ctx = shift;
     my $file = shift;
-
-    my $helper = $ctx->new_helper;
-    my $mt = Text::MicroTemplate::Extended->new(
-        include_path => $self->template_paths,
-        template_args => { ctx => $ctx, helper => $helper },
-    );
-
-    $mt->render($file, @_);
+    $self->SUPER::render($ctx, $file, {}, @_);
 }
-
-sub raw { Docs::UI::Helper->raw(@_); }
-sub u { raw(Docs::UI::Helper->escape_url(@_)); }
-sub js { raw(Docs::UI::Helper->escape_js(@_)); }
 
 no Any::Moose;
 __PACKAGE__->meta->make_immutable;
