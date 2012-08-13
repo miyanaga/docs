@@ -4,7 +4,7 @@ my $document = $ctx->document;
 my $folder = $ctx->folder;
 my $node = $ctx->node;
 my $global_nav_limit = int( $ctx->app->config->cascade_find(qw/ui bootstrap global_nav_limit/)->as_scalar // 10 );
-my $shortcut_level = $node->metadata->ctx_cascade_find($ctx, 'headline_shortcut', 'lavel')->as_scalar // 1;
+my $shortcut_level = $node->metadata->ctx_cascade_find($ctx, 'headline_shortcut', 'level')->as_scalar // 1;
 my $shortcut_levels = $shortcut_level =~ /^[0-9]+$/
     ? join(',', map { "h$_" } ( 1..int($shortcut_level) ) )
     : $shortcut_level;
