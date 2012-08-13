@@ -26,7 +26,7 @@ my $book = $books->find_uri('example');
     is $book->naming->title, 'Example';
 
     my @children = values %{$book->children('uri')};
-    is scalar @children, 8;
+    is scalar @children, 9;
 }
 
 my $en = $book->find_uri('en');
@@ -556,6 +556,40 @@ The quick brown fox jumps over the lazy dog<br />};
 <td class="col2">value2-2</td>
 <td class="col3">value2-3</td>
 </table>
+};
+
+}
+
+{
+    my $headlines = $book->path_find('headlines');
+    ok $headlines;
+
+    my $ctx = $app->new_context(lang => 'en');
+    is $headlines->path_find('serializebycontent')->ctx_html($ctx), q{<h1 id="145ce122ab415b29">Headline1</h1>
+
+<h2 id="28fc890055613497">Headline2</h2>
+};
+
+    is $headlines->path_find('serializebyposition')->ctx_html($ctx), q{<h1 id="cfcd208495d565ef">Headline1</h1>
+
+<h2 id="c4ca4238a0b92382">Headline2</h2>
+};
+
+    is $headlines->path_find('serializestrictly')->ctx_html($ctx), q{<h1 id="145ce122ab415b29">Headline1</h1>
+
+<h2 id="28fc890055613497">Headline2</h2>
+};
+
+    is $headlines->path_find('serializeforcestrictly')->ctx_html($ctx), q{<h1 id="145ce122ab415b29">Headline1</h1>
+
+<h2 id="28fc890055613497">Headline2</h2>
+
+<h1 id="4690f3499e4a9eed">Headline1</h1>
+};
+
+    is $headlines->path_find('serializewith8')->ctx_html($ctx), q{<h1 id="145ce122">Headline1</h1>
+
+<h2 id="28fc8900">Headline2</h2>
 };
 
 }

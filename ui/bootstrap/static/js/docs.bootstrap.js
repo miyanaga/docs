@@ -59,15 +59,46 @@
         });
     };
 
+    // Global nav visibility
+    $.fn.docsGlobalNavVisibility = function(options) {
+        var defaults = {
+            height: 120,
+        };
+        var opts = $.extend(defaults, options);
+
+        return this.each(function() {
+            var $nav = $(this);
+            $(window).scroll(function() {
+                if ( $nav.css('position') != 'fixed' ) return;
+                var top = $(window).scrollTop();
+                if ( top < opts.height ) {
+                    $nav.show();
+                } else {
+                    $nav.hide();
+                }
+            });
+
+            $('body').mousemove(function(e) {
+                if ( $nav.css('position') != 'fixed' ) return;
+                var top = $(window).scrollTop();
+                if ( e.clientY < opts.height ) {
+                    $nav.show();
+                } else if ( top > opts.height ) {
+                    $nav.hide();
+                }
+            });
+        });
+    };
+
     // TOC
     $.fn.docsHeadlinesShortcut = function(options) {
         var defaults = {
-            target: 'h1',
+            levels: 'data-headline-shortcut-levels',
             prefix: 'docs-headline',
             delimiter: '-',
             selector: '.docs-headline-shortcuts',
-            addAnchor: function(anchor, title, count) {
-                var $li = $('<li><a></a></li>');
+            addAnchor: function(anchor, tagname, title, count) {
+                var $li = $('<li class="docs-headline-shortcut-' + tagname.toLowerCase() + '"><a></a></li>');
                 $li.find('a').attr('href', '#' + anchor).text(' ' + title).prepend($('<i class="icon-share-alt">'));
                 $(this).append($li);
                 if ( count > 1 ) $(this).show();
@@ -79,19 +110,41 @@
         return this.each(function() {
             i++;
             var $article = $(this),
-                toc = $(this).find(opts.selector).get(0);
+                toc = $(this).find(opts.selector).get(0),
+                targets = $(this).attr(opts.levels);
 
             var j = 0;
-            $(this).find(opts.target).each(function() {
+            $(this).find(targets).each(function() {
                 j++;
                 var $target = $(this);
 
                 if ( $target.text() ) {
-                    var anchor = opts.prefix + i + opts.delimiter + j;
-                    var $a = $('<a></a>').attr('name', anchor);
-                    $target.before($a);
-                    opts.addAnchor.call(toc, anchor, $target.text(), j);
+                    if ( !$target.attr('id') ) {
+                        var anchor = opts.prefix + i + opts.delimiter + j;
+                        $target.attr('id', anchor);
+                    }
+                    opts.addAnchor.call(toc, $target.attr('id'), $target.get(0).tagName, $target.text(), j);
                 }
+            });
+        });
+    };
+
+    // Temporary link to headlines
+    $.fn.docsHeadlinesTemplink = function(options) {
+        var defaults = {
+            target: 'h1,h2,h3,h4,h5,h6',
+            addAnchor: function(id) {
+                var $a = $('<a>&sect;</a>').addClass('docs-templink').attr('href', '#' + id);
+                $(this).append($a);
+            }
+        };
+        var opts = $.extend(defaults, options);
+
+        return this.each(function() {
+            $(this).find(opts.target).each(function() {
+                var id = $(this).attr('id');
+                if ( !id ) return;
+                opts.addAnchor.call(this, id);
             });
         });
     };
@@ -222,8 +275,13 @@ jQuery(function() {
     $('div.docs-node-relations').docsLoadRelations();
     $('body').docsSitemapOpener();
 
+    // GlobalNav
+    $('#global-nav').docsGlobalNavVisibility();
+
     // Headline shortcut
-    $('article.docs-node section.docs-node-body').docsHeadlinesShortcut();
+    $('article.docs-node section.docs-node-body')
+        .docsHeadlinesShortcut()
+        .docsHeadlinesTemplink();
 
     // Glossary
     $('article.docs-node').docsReplaceGlossary({

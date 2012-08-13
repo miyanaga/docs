@@ -3,6 +3,7 @@ package Docs::ContextMethod::Node;
 use strict;
 use warnings;
 
+use Encode;
 use DateTime;
 use Sweets::String qw(trim);
 use Docs::Model::Node::Tag;
@@ -328,6 +329,39 @@ sub body {
     $body;
 }
 
+{
+    sub serialize_headlines {
+        my ( $node, $ctx, $body, $serialize, $length ) = @_;
+        my $pos = 0;
+        my %serials;
+        my $redundancy = 0;
+        $body =~ s!<(h[1-6])(\s+[^>]+|\s*)>(.*?)(</\1>)!{
+            my ( $tag, $attr, $inner, $tail ) = ( $1, $2, $3, $4 );
+            unless ( $attr =~ /\sid=/i ) {
+                my $content = $inner;
+                $content =~ s/<(.+?)>//igs;
+                my $serial = 'position' eq $serialize
+                    ? $pos # position
+                    : 'strict'
+                        ? $pos . $content # strict
+                        : $content; # content
+
+                $serial = Encode::encode_utf8($serial) if utf8::is_utf8($serial);
+                $serial = substr(md5_hex($serial), 0, $length);
+                $redundancy = 1 if $serials{$serial};
+                $serials{$serial} = 1;
+                $attr .= qq{ id="$serial"};
+                $pos++;
+            }
+            qq{<$tag$attr>$inner$tail};
+        }!iges;
+
+        return $serialize ne 'strict' && $redundancy
+            ? serialize_headlines( $node, $ctx, $body, 'strict', $length )
+            : $body;
+    }
+}
+
 sub html {
     my $node = shift;
     my $ctx = shift;
@@ -355,6 +389,10 @@ sub html {
         }
         $result;
     }!iegs;
+
+    my $serialize = lc($node->metadata->ctx_cascade_find($ctx, 'headline', 'serialize')->as_scalar || 'content');
+    my $length = $node->metadata->ctx_cascade_find($ctx, 'headline', 'serial_length')->as_scalar // 16;
+    $body = serialize_headlines($node, $ctx, $body, $serialize, $length) if $serialize ne 'none' && $length;
 
     $body;
 }

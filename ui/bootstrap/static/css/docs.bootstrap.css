@@ -46,11 +46,7 @@
     text-overflow: ellipsis;
 }
 
-a.docs-node-link.docs-with-numbering span {
-    display: table-cell;
-}
-
-a.docs-node-link.docs-with-numbering span.docs-numbering {
+a.docs-node-link.docs-with-numbering > * {
     display: table-cell;
     padding-right: 4px;
 }
@@ -133,6 +129,12 @@ body.docs-search-tag .docs-search-box {
     display: none;
 }
 
+@media (max-width:active 979px) {
+    .navbar-fixed-top {
+        display: block !important;
+    }
+}
+
 #navigation-tags .docs-tag-cloud {
     margin-bottom: 16px;
     text-align: center;
@@ -144,11 +146,49 @@ article.docs-node .docs-headline-shortcuts {
     margin-left: 16px;
 }
 
+article.docs-node .docs-headline-shortcuts li {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+article.docs-node .docs-headline-shortcut-h2 {
+    padding-left: 16px;
+}
+article.docs-node .docs-headline-shortcut-h3 {
+    padding-left: 32px;
+}
+article.docs-node .docs-headline-shortcut-h4 {
+    padding-left: 48px;
+}
+article.docs-node .docs-headline-shortcut-h5 {
+    padding-left: 64px;
+}
+article.docs-node .docs-headline-shortcut-h6 {
+    padding-left: 80px;
+}
+
 @media screen and ( max-width: 768px ) {
     article.docs-node .docs-headline-shortcuts {
         float: none;
         margin-left: 0px;
     }
+}
+
+.docs-templink {
+    display: none;
+    font-weight: normal;
+    padding-left: 8px;
+    text-decoration: none;
+}
+
+h1:hover .docs-templink,
+h2:hover .docs-templink,
+h3:hover .docs-templink,
+h4:hover .docs-templink,
+h5:hover .docs-templink,
+h6:hover .docs-templink {
+    display: inline-block;
+    text-decoration: none;
 }
 
 article.docs-node section h1,

@@ -1,9 +1,14 @@
-? extends 'layout/two-columns';
-? my $document = $ctx->document;
-? my $folder = $ctx->folder;
-? my $node = $ctx->node;
-? my $global_nav_limit = Docs::app()->config->cascade_find(qw/ui bootstrap global_nav_limit/)->as_scalar;
-? $global_nav_limit = 5 unless defined $global_nav_limit;
+<?
+extends 'layout/two-columns';
+my $document = $ctx->document;
+my $folder = $ctx->folder;
+my $node = $ctx->node;
+my $global_nav_limit = int( $ctx->app->config->cascade_find(qw/ui bootstrap global_nav_limit/)->as_scalar // 10 );
+my $shortcut_level = $node->metadata->ctx_cascade_find($ctx, 'headline_shortcut', 'lavel')->as_scalar // 1;
+my $shortcut_levels = $shortcut_level =~ /^[0-9]+$/
+    ? join(',', map { "h$_" } ( 1..int($shortcut_level) ) )
+    : $shortcut_level;
+?>
 
 ? block global_primary_nav => sub {
     <? my @menus = $ctx->book->ctx_children($ctx); ?>
@@ -60,7 +65,7 @@
         </header>
 
         <? if ( my $body = $document->ctx_html($ctx) ) { ?>
-        <section class="docs-node-body">
+        <section class="docs-node-body" data-headline-shortcut-levels="<?= $shortcut_levels ?>">
             <ul class="well docs-headline-shortcuts pull-right nav nav-stacked nav-pills"></ul>
             <?= raw($body); ?>
         </section>
