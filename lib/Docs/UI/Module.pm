@@ -4,12 +4,9 @@ use strict;
 use warnings;
 
 use Any::Moose;
-use parent 'Docs::Template';
+use parent 'Docs::UI';
 
-has name => ( is => 'ro', isa => 'Str', required => 1 );
-has include_paths => ( is => 'ro', isa => 'ArrayRef', lazy => 1, default => sub {
-    Docs::app()->components->dir_paths_to('modules'),
-});
+has file => ( is => 'ro', isa => 'Str', required => 1 );
 
 sub render {
     my $self = shift;
@@ -25,7 +22,7 @@ sub render {
         formatter => $node->formatter,
     );
 
-    $self->SUPER::render( $ctx, $self->name, \%args );
+    $self->ctx_render( $ctx, 'modules/' . $self->file, \%args, @_ );
 }
 
 no Any::Moose;

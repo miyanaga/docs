@@ -18,10 +18,11 @@ has context => ( is => 'ro', isa => 'Docs::Context', lazy_build => 1, builder =>
 
 sub render {
     my $self = shift;
+    my $file = shift;
     my $ctx = $self->context;
     my $app = Docs::app();
 
-    $self->finish($app->ui->ctx_render( $ctx, @_ )->as_string);
+    $self->finish($app->ui->ctx_render( $ctx, $file, {}, @_ )->as_string);
 }
 
 sub dispatch_action {

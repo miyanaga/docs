@@ -35,7 +35,9 @@ sub ctx_render {
     my $self = shift;
     my $ctx = shift;
     my $file = shift;
-    $self->SUPER::render($ctx, $file, {}, @_);
+    my $args = shift || {};
+
+    $self->SUPER::render($ctx, $file, $args, @_);
 }
 
 no Any::Moose;

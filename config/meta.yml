@@ -8,8 +8,15 @@ tag_group_classes:
     _all: label
 copyright: %Y <a href="http://www.ideamans.com/">ideaman's Inc.</a>
 lead_formatter: md
-title: Docs
+title: docs
 excerpt_length.ja: 200
 excerpt_words: 40
 gravatar:
     url: http://www.gravatar.com/avatar/%s?s=48&d=404
+module:
+    table:
+        default_class: table table-striped
+        default_class.ja: table table-striped table-bordered
+    tree:
+        default_class: unstyled docs-tree
+caption: always

@@ -19,8 +19,7 @@ test_psgi $app, sub {
     is $res->code, 200;
     is $res->content, '/~test/path_info';
 
-    # $res = $cb->(GET "http://localhost/example/en/formatters/htmldoc");
-    # diag $res->content;
+    $res = $cb->(GET "http://localhost/example/en/formatters/htmldoc");
 
     $res = $cb->(GET "http://localhost/~test/unknown");
     is $res->content, 'unknown test';

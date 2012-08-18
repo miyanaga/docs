@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 our $NAME = 'Docs';
-our $VERSION = '0.66';
+our $VERSION = '0.68';
 our $APP_CLASS = 'Docs::Application';
 
 use Docs::Application;

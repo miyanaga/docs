@@ -254,18 +254,19 @@ sub body_without_lead {
             raw => $attributes,
         );
         $params{attributes} = $attrs;
-        my ( $file ) = $attrs->remove('') || $attrs->remove('file') || return '';
+        my ( $file ) = $attrs->remove('') || $attrs->remove('file') || $attrs->remove('name') || return '';
         my ( $format ) = $attrs->remove('format') || $node->metadata->ctx_cascade_find($ctx, 'module', $file, 'default_format')->as_scalar || 'yaml';
         my ( $dump ) = $attrs->remove('dump');
 
         my $values;
-        $inner =~ s/^\s*\n//s;
-        $inner =~ s/\n\s*$//s;
         if ( $format =~ /^([tcs])sv$/i ) {
+            my $type = $1;
+            $inner =~ s/^\s*\n//s;
+            $inner =~ s/\n\s*$//s;
             my $xsv = Sweets::Text::Xsv->new(
-                separator => $1 eq 'c'
+                separator => $type eq 'c'
                     ? ','
-                    : $1 eq 's'
+                    : $type eq 's'
                         ? qr/\s+/
                         : "\t",
             );
@@ -273,11 +274,15 @@ sub body_without_lead {
             $values = $xsv->rows;
             $params{xsv} = $xsv;
         } elsif ( $format =~ /^ya?ml$/i ) {
+            $inner =~ s/^\s*\n//s;
+            $inner =~ s/\n\s*$//s;
             eval {
                 my $var = Sweets::Variant->from_yaml($inner);
                 $values = $var->raw;
                 $params{variant} = $var;
             };
+        } else {
+            $values = $inner;
         }
 
         my $module = $ctx->new_module( $file );
@@ -288,7 +293,7 @@ sub body_without_lead {
         }
 
         if ( $dump ) {
-            $result .= '<div class="docs-dumper">' . Data::Dumper::HTML::dumper_html(
+            $result .= '<div class="docs-dump">' . Data::Dumper::HTML::dumper_html(
                 '$attributes' => $attributes,
                 '$values' => $values,
             ) . '</div>';
@@ -311,12 +316,15 @@ sub body {
     $source =~ s|<docs:lang\s+([a-z]+)>\s*(.*?)\s*</docs:lang>|{$1 eq $ctx->language->key? $2: ''}|iges;
 
     # docs:pre, module
-    $source =~ s!<docs:(pre|module)(\s+[^>]*|\s*)>(.*?)</docs:\1>!{
+    $source =~ s!<docs:(pre|code|module)(\s+[^>]*|\s*)>(.*?)</docs:\1>!{
         my $tag = lc($1);
         my $attr = $2;
         my $inner = $3;
-        if ( $tag eq 'pre' ) {
+        if ( $tag eq 'pre' || $tag eq 'code' ) {
             $inner = encode_entities($inner, q{<>&"});
+            if ( $tag eq 'code' ) {
+                $attr .= q{ class="linenums"} unless $attr =~ /\sclass=/i;
+            }
             qq{<pre$attr>$inner</pre>};
         } elsif ( $tag eq 'module' ) {
             expand_module($node, $ctx, $attr, $inner);

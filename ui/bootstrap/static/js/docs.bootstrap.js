@@ -330,6 +330,15 @@ jQuery(function() {
         prettyPrint();
     }
 
+    // Image caption
+    $('section.docs-node-body').each(function() {
+        var caption = $(this).attr('data-caption');
+        if ( !caption ) return;
+        console.log(caption);
+        var param = caption == 'hover'? { animate: true }: {};
+        $(this).find('img[alt]').jcaption(param);
+    });
+
     // TODO: Remove
     $('.docs-rebuilder').click(function(e) {
         e.preventDefault();

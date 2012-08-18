@@ -508,54 +508,103 @@ The quick brown fox jumps over the lazy dog<br />};
     ok $node;
 
     my $ctx = $app->new_context(lang => 'en', node => $node);
-    my $body = $node->ctx_body($ctx);
+    my $body = $node->ctx_html($ctx);
     is $body, q{<table class="default-class" id="the-table">
+<tr>
 <th class="col1">head1</th>
 <th class="col2">head2</th>
 <th class="col3">head3</th>
+</tr>
+<tr>
 <td class="col1">value1-1</td>
 <td class="col2">value1-2</td>
 <td class="col3">value1-3</td>
+</tr>
+<tr>
 <td class="col1">value2-1</td>
 <td class="col2">value2-2</td>
 <td class="col3">value2-3</td>
+</tr>
 </table>
 
 <table class="table" id="the-table">
+<tr>
 <th class="col1">head1</th>
 <th class="col2">head2</th>
 <th class="col3">head3</th>
+</tr>
+<tr>
 <td class="col1">value1-1</td>
 <td class="col2">value1-2</td>
 <td class="col3">value1-3</td>
+</tr>
+<tr>
 <td class="col1">value2-1</td>
 <td class="col2">value2-2</td>
 <td class="col3">value2-3</td>
+</tr>
 </table>
 
 <table class="table" id="the-table">
+<tr>
 <th class="col1">head1</th>
 <th class="col2">head2</th>
 <th class="col3">head3</th>
+</tr>
+<tr>
 <td class="col1">value1-1</td>
 <td class="col2">value1-2</td>
 <td class="col3">value1-3</td>
+</tr>
+<tr>
 <td class="col1">value2-1</td>
 <td class="col2">value2-2</td>
 <td class="col3">value2-3</td>
+</tr>
 </table>
 
 <table class="table" id="the-table">
+<tr>
 <th class="col1">head1</th>
 <th class="col2">head2</th>
 <th class="col3">head3</th>
+</tr>
+<tr>
 <td class="col1">value1-1</td>
 <td class="col2">value1-2</td>
 <td class="col3">value1-3</td>
+</tr>
+<tr>
 <td class="col1">value2-1</td>
 <td class="col2">value2-2</td>
 <td class="col3">value2-3</td>
+</tr>
 </table>
+};
+
+}
+
+{
+    my $node = $app->books->path_find('/example/modules/tree');
+    ok $node;
+
+    my $ctx = $app->new_context(lang => 'en', node => $node);
+    my $body = $node->ctx_html($ctx);
+    is $body, q{<ul class="default-class">
+<li>branch1</li>
+<li>branch2</li>
+<ul class="default-class">
+<li>branch3-1</li>
+<li>brahch3-2</li>
+</ul>
+<li>branch4</li>
+<ul class="default-class">
+<li>branch 5-1</li>
+<ul class="default-class">
+<li>branch 5-1-1</li>
+</ul>
+</ul>
+</ul>
 };
 
 }

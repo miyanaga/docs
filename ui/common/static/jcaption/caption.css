@@ -1,0 +1,21 @@
+section.docs-node-body div.caption {
+	margin: 0;
+	padding:0;
+	position: relative;
+}
+
+section.docs-node-body div.caption p {
+	position: absolute;
+	margin: 0; padding: 2px;
+	font-size: .9em;
+
+	bottom: 0;
+	left: 0;
+	background:black;
+	color: white;
+	opacity: .7;
+}
+
+section.docs-node-body div.caption img {
+	margin: 0; padding: 0;
+}

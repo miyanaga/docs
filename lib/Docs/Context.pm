@@ -155,7 +155,7 @@ sub new_module {
     my ( $file ) = @_;
 
     Docs::UI::Module->new(
-        name => $file,
+        file => $file,
     );
 }
 

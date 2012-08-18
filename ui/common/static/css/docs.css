@@ -32,6 +32,10 @@
     font-family: monospace;
 }
 
+.docs-tree .docs-tree {
+    margin-left: 16px;
+}
+
 @media screen {
     .print {
         display: none !important;

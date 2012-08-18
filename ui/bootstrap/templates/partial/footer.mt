@@ -16,6 +16,7 @@
     <script src="/static/js/jquery-1.7.2.min.js"></script>
     <script src="/static/js/jquery.cookie.js"></script>
     <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/static/jcaption/jcaption.min.js"></script>
     <script src="/static/js/jquery.replace-text.js"></script>
     <script src="/static/js/docs.js"></script>
     <script src="/static/js/docs.bootstrap.js"></script>

@@ -1,5 +1,7 @@
 <?
 extends 'layout/two-columns';
+my %args = @_;
+my $html = $args{html};
 my $document = $ctx->document;
 my $folder = $ctx->folder;
 my $node = $ctx->node;
@@ -8,6 +10,7 @@ my $shortcut_level = $node->metadata->ctx_cascade_find($ctx, 'headline_shortcut'
 my $shortcut_levels = $shortcut_level =~ /^[0-9]+$/
     ? join(',', map { "h$_" } ( 1..int($shortcut_level) ) )
     : $shortcut_level;
+my $caption = $node->metadata->ctx_cascade_find($ctx, 'caption')->as_scalar || 'never';
 ?>
 
 ? block global_primary_nav => sub {
@@ -64,10 +67,10 @@ my $shortcut_levels = $shortcut_level =~ /^[0-9]+$/
             <hr>
         </header>
 
-        <? if ( my $body = $document->ctx_html($ctx) ) { ?>
-        <section class="docs-node-body" data-headline-shortcut-levels="<?= $shortcut_levels ?>">
+        <? if ( $html ) { ?>
+        <section class="docs-node-body" data-headline-shortcut-levels="<?= $shortcut_levels ?>" data-caption="<?= $caption ?>">
             <ul class="well docs-headline-shortcuts pull-right nav nav-stacked nav-pills"></ul>
-            <?= raw($body); ?>
+            <?= raw($html); ?>
         </section>
         <? } ?>
 

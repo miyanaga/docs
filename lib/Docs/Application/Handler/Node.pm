@@ -55,7 +55,11 @@ sub get {
     }
 
     my $template = $node->ctx_template($ctx);
-    $self->render($template);
+
+    # Prerender html because Text::MicroTemplate::Extend can't render nestedly
+    my $html = $node->ctx_html($ctx);
+
+    $self->render($template, html => $html);
 }
 
 sub sitemap {

@@ -13,6 +13,7 @@
     <table <?= raw($attrs) ?>>
     <? for my $row ( @$values ) { ?>
         <? if ( ref $row eq 'ARRAY' ) { ?>
+            <tr>
             <? for ( my $i = 0; $i < scalar @$row; $i++) { ?>
                 <? my $class = $classes[$i] || ''; ?>
                 <? my $value = $row->[$i] || ''; ?>
@@ -22,6 +23,7 @@
                     <td class="<?= raw($class) ?>"><?= raw($value) ?></td>
                 <? } ?>
             <? } ?>
+            </tr>
         <? } ?>
     <? } ?>
     </table>
