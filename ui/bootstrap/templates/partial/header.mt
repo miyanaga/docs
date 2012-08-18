@@ -30,9 +30,10 @@
     </style>
     <link href="/static/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
     <link href="/static/css/prettify.css" rel="stylesheet">
+    <link href="/static/jcaption/caption.css" rel="stylesheet">
     <link href="/static/css/docs.css" rel="stylesheet">
     <link href="/static/css/docs.bootstrap.css" rel="stylesheet">
-    <link href="/static/jcaption/caption.css" rel="stylesheet">
+    <link href="/static/css/custom.css" rel="stylesheet">
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
