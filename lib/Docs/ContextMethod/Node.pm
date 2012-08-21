@@ -50,11 +50,12 @@ sub children {
     my $node = shift;
     my $ctx = shift;
 
+    my $n = $node->is_index? $node->folder: $node;
     my @children = grep {
         !$_->ctx_hidden($ctx) && !$_->is_index;
     } sort {
         $a->ctx_order($ctx) <=> $b->ctx_order($ctx)
-    } @{$node->sorted_children('uri')};
+    } @{$n->sorted_children('uri')};
 
     wantarray? @children: \@children;
 }
@@ -307,7 +308,8 @@ sub body {
     my $node = shift;
     my $ctx = shift;
 
-    my $body = $node->ctx_stash($ctx, 'body');
+    my $stash_key = 'body:' . $ctx->language->key;
+    my $body = $node->stash($stash_key);
     return $body if defined($body);
 
     my $source = $node->source || return '';
@@ -333,7 +335,7 @@ sub body {
 
     $body = $node->formatter->format($source);
 
-    $node->ctx_stash($ctx, 'body', $body || '');
+    $node->stash($stash_key, $body || '');
     $body;
 }
 
@@ -403,6 +405,80 @@ sub html {
     $body = serialize_headlines($node, $ctx, $body, $serialize, $length) if $serialize ne 'none' && $length;
 
     $body;
+}
+
+sub figures {
+    my $node = shift;
+    my $ctx = shift;
+
+    $node = $node->document;
+    my $figures = $node->ctx_stash($ctx, 'figures');
+    return ( wantarray? @$figures: $figures ) if $figures;
+
+    my $body = $node->ctx_body($ctx);
+    my @figures;
+    while ( $body =~ m!<img(\s[^>]+)>!isg ) {
+        my $tag = $&;
+        my $attrs = $1;
+        next if $attrs !~ /\salt=/i || $attrs !~ /\ssrc=/i;
+
+        $attrs = Sweets::Text::HTML::Attributes::Parser->new(
+            raw => $attrs,
+        );
+
+        push @figures, {
+            node => $node,
+            tag => $tag,
+            src => $node->absolute_url_of($attrs->lookup('src')),
+            alt => $attrs->lookup('alt'),
+        };
+    }
+
+    $node->ctx_stash($ctx, 'figures', \@figures);
+    wantarray? @figures: \@figures;
+}
+
+sub unique_figures {
+    my $node = shift;
+    my $ctx = shift;
+
+    $node = $node->document;
+    my $figures = $node->ctx_stash($ctx, 'unique_figures');
+    return ( wantarray? @$figures: $figures ) if $figures;
+
+    my @figures = $node->ctx_figures($ctx);
+    my %unique;
+    @figures = grep { $unique{$_->{src}}? 0: ($unique{$_->{src}} = 1) } grep { $_->{src} } @figures;
+
+    $node->ctx_stash($ctx, 'unique_figures', \@figures);
+    wantarray? @figures: \@figures;
+}
+
+sub all_figures {
+    my $node = shift;
+    my $ctx = shift;
+    pop;
+    my $limit = shift || 0;
+
+    $node = $node->document;
+    my $figures = $node->ctx_stash($ctx, 'all_figures:' . $limit);
+    return ( wantarray? @$figures: $figures ) if $figures;
+
+    my @figures = $node->ctx_figures($ctx);
+    my @children = $node->ctx_children($ctx);
+    for my $n ( @children ) {
+        push @figures, $n->ctx_all_figures($ctx);
+    }
+
+    my %unique;
+    @figures = grep { $unique{$_->{src}}? 0: ($unique{$_->{src}} = 1) } grep { $_->{src} } @figures;
+
+    if ( $limit && scalar @figures > $limit ) {
+        @figures = @figures[0..$limit - 1];
+    }
+
+    $node->ctx_stash($ctx, 'all_figures' . $limit, \@figures);
+    wantarray? @figures: \@figures;
 }
 
 sub plain_text {

@@ -46,7 +46,7 @@
     text-overflow: ellipsis;
 }
 
-a.docs-node-link.docs-with-numbering > * {
+ul li a.docs-node-link.docs-with-numbering > * {
     display: table-cell;
     padding-right: 4px;
 }
@@ -138,6 +138,23 @@ body.docs-search-tag .docs-search-box {
 #navigation-tags .docs-tag-cloud {
     margin-bottom: 16px;
     text-align: center;
+}
+
+#navigation-figures .btn.increment {
+    width: 100%;
+}
+
+section.docs-figures {
+    margin-left: -8px;
+}
+
+section.docs-figures a {
+    margin-left: 8px;
+    display: inline-block;
+}
+
+section.docs-figures img {
+    max-height: 160px;
 }
 
 article.docs-node .docs-headline-shortcuts {

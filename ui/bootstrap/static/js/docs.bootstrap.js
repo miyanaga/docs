@@ -266,6 +266,35 @@
         });
     };
 
+    // Figures caption
+    $.fn.docsFiguresCaption = function() {
+        return this.each(function() {
+            var caption = $(this).attr('data-caption');
+            if ( !caption ) return;
+            var param = caption == 'hover'? { animate: true }: {};
+            $(this).find('img[alt]').jcaption(param);
+        });
+    };
+
+    // Figure navigation
+    $.fn.docsFiguresNavigation = function() {
+        return this.each(function() {
+            var $container = $(this);
+            $container.docsFiguresCaption().find('.increment').click(function() {
+                var $button = $(this);
+                var $list = $button.parents('ul');
+                $.get(
+                    $button.attr('data-url'),
+                    function(data) {
+                        $list.append(data);
+                        $container.docsFiguresCaption();
+                        $button.remove();
+                    }
+                );
+            });
+        });
+    };
+
 })(jQuery);
 
 jQuery(function() {
@@ -309,6 +338,9 @@ jQuery(function() {
                     $dt.find('span').text('*' + g.index);
                     $dt.find('*[rel=tooltip]').text(g.keyword);
                     var $dd = $('<dd></dd>').text(g.description);
+                    if ( g.link && g.link.match(/^https?:/i) ) {
+                        $dd.append($('<a></a>').attr('href', g.link).text( g.link ));
+                    }
 
                     $dl.append($dt).append($dd);
                 });
@@ -331,13 +363,7 @@ jQuery(function() {
     }
 
     // Image caption
-    $('section.docs-node-body').each(function() {
-        var caption = $(this).attr('data-caption');
-        if ( !caption ) return;
-        console.log(caption);
-        var param = caption == 'hover'? { animate: true }: {};
-        $(this).find('img[alt]').jcaption(param);
-    });
+    $('section.docs-node-body,section.docs-figures').docsFiguresCaption();
 
     // TODO: Remove
     $('.docs-rebuilder').click(function(e) {

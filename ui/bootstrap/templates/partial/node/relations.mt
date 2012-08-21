@@ -10,6 +10,7 @@
             <li>
                 <? my $icon = $helper->theme_icon($relation); ?>
                 <? my $tags = join( "\n", map { raw($helper->link_to_tag($_, nolink => 1)); } @{$node->ctx_tags($ctx)} ) || ''; ?>
+                <? $tags = qq{<span class="docs-tags">$tags</span>}; ?>
                 <?= raw($helper->link_to_node($node, prepend => "$icon\n", append => "\n$tags")); ?>
             </li>
         <? } ?>

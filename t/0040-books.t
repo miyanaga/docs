@@ -26,7 +26,7 @@ my $book = $books->find_uri('example');
     is $book->naming->title, 'Example';
 
     my @children = values %{$book->children('uri')};
-    is scalar @children, 9;
+    is scalar @children, 10;
 }
 
 my $en = $book->find_uri('en');
@@ -641,6 +641,193 @@ The quick brown fox jumps over the lazy dog<br />};
 <h2 id="28fc8900">Headline2</h2>
 };
 
+}
+
+{
+    my $node = $book->find_uri(qw/figures/)->index_node;
+    ok $node;
+
+    my $ctx = $app->new_context(lang => 'en');
+    my @figures = $node->ctx_figures($ctx);
+
+    my @nodes = map { delete $_->{node} } @figures;
+    my @tags = map { delete $_->{tag} } @figures;
+
+    is_deeply \@figures, [
+        {
+         'alt' => 'Figure1-1',
+         'src' => '/example/figures/figure1-1.png'
+        },
+        {
+         'alt' => 'Figure1-1 Duplicated',
+         'src' => '/example/figures/figure1-1.png'
+        },
+        {
+         'alt' => 'Figure1-2',
+         'src' => '/example/figures/images/figure1-2.png'
+        },
+        {
+         'alt' => 'Figure1-3',
+         'src' => '/images/figure1-3.png'
+        },
+        {
+         'alt' => 'Figure1-4',
+         'src' => '/example/figures/figure1-4.png'
+        },
+        {
+         'alt' => 'Figure1-5',
+         'src' => '/example/figures/images/figure1-5.png'
+        },
+        {
+         'alt' => 'Figure1-6',
+         'src' => '/example/figures/figure1-6.png'
+        }
+    ];
+
+    my $unique = $node->ctx_unique_figures($ctx);
+    @nodes = map { delete $_->{node} } @$unique;
+    @tags = map { delete $_->{tags} } @$unique;
+
+    is_deeply $unique, [
+        {
+         'alt' => 'Figure1-1',
+         'src' => '/example/figures/figure1-1.png'
+        },
+        {
+         'alt' => 'Figure1-2',
+         'src' => '/example/figures/images/figure1-2.png'
+        },
+        {
+         'alt' => 'Figure1-3',
+         'src' => '/images/figure1-3.png'
+        },
+        {
+         'alt' => 'Figure1-4',
+         'src' => '/example/figures/figure1-4.png'
+        },
+        {
+         'alt' => 'Figure1-5',
+         'src' => '/example/figures/images/figure1-5.png'
+        },
+        {
+         'alt' => 'Figure1-6',
+         'src' => '/example/figures/figure1-6.png'
+        }
+    ];
+
+    my @all = $node->ctx_all_figures($ctx);
+    @nodes = map { delete $_->{node} } @all;
+    @tags = map { delete $_->{tag} } @all;
+
+    is_deeply \@all, [
+        {
+         'alt' => 'Figure1-1',
+         'src' => '/example/figures/figure1-1.png'
+        },
+        {
+         'alt' => 'Figure1-2',
+         'src' => '/example/figures/images/figure1-2.png'
+        },
+        {
+         'alt' => 'Figure1-3',
+         'src' => '/images/figure1-3.png'
+        },
+        {
+         'alt' => 'Figure1-4',
+         'src' => '/example/figures/figure1-4.png'
+        },
+        {
+         'alt' => 'Figure1-5',
+         'src' => '/example/figures/images/figure1-5.png'
+        },
+        {
+         'alt' => 'Figure1-6',
+         'src' => '/example/figures/figure1-6.png'
+        },
+        {
+         'alt' => 'Figure2-1',
+         'src' => '/example/figures/figure2-1.png'
+        },
+        {
+         'alt' => 'Figure2-2',
+         'src' => '/example/figures/images/figure2-2.png'
+        },
+        {
+         'alt' => 'Figure2-3',
+         'src' => '/images/figure2-3.png'
+        },
+        {
+         'alt' => 'Figure2-4',
+         'src' => '/example/figures/figure2-4.png'
+        },
+        {
+         'alt' => 'Figure2-5',
+         'src' => '/example/figures/images/figure2-5.png'
+        },
+        {
+         'alt' => 'Figure2-6',
+         'src' => '/example/figures/figure2-6.png'
+        },
+        {
+         'alt' => 'Figure3-1',
+         'src' => '/example/figures/sub-folder/figure3-1.png'
+        },
+        {
+         'alt' => 'Figure3-2',
+         'src' => '/example/figures/sub-folder/images/figure3-2.png'
+        },
+        {
+         'alt' => 'Figure3-3',
+         'src' => '/images/figure3-3.png'
+        },
+        {
+         'alt' => 'Figure3-4',
+         'src' => '/example/figures/sub-folder/figure3-4.png'
+        },
+        {
+         'alt' => 'Figure3-5',
+         'src' => '/example/figures/sub-folder/images/figure3-5.png'
+        },
+        {
+         'alt' => 'Figure3-6',
+         'src' => '/example/figures/sub-folder/figure3-6.png'
+        },
+        {
+         'alt' => 'Figure4-1',
+         'src' => '/example/figures/sub-folder/figure4-1.png'
+        },
+        {
+         'alt' => 'Figure4-2',
+         'src' => '/example/figures/sub-folder/images/figure4-2.png'
+        },
+        {
+         'alt' => 'Figure4-3',
+         'src' => '/images/figure4-3.png'
+        },
+        {
+         'alt' => 'Figure4-4',
+         'src' => '/example/figures/sub-folder/figure4-4.png'
+        },
+        {
+         'alt' => 'Figure4-5',
+         'src' => '/example/figures/sub-folder/images/figure4-5.png'
+        },
+        {
+         'alt' => 'Figure4-6',
+         'src' => '/example/figures/sub-folder/figure4-6.png'
+        },
+    ];
+
+    my @all_limited = $node->ctx_all_figures($ctx, 1);
+    @nodes = map { delete $_->{node} } @all_limited;
+    @tags = map { delete $_->{tag} } @all_limited;
+
+    is_deeply \@all_limited, [
+        {
+         'alt' => 'Figure1-1',
+         'src' => '/example/figures/figure1-1.png'
+        },
+    ];
 }
 
 done_testing;

@@ -38,6 +38,16 @@ sub metadata {
     $self->index_node? $self->index_metadata: $self->empty_metadata;
 }
 
+sub source {
+    my $self = shift;
+    $self->index_node? $self->index_node->source: '';
+}
+
+sub formatter {
+    my $self = shift;
+    $self->index_node? $self->index_node->formatter: undef;
+}
+
 sub child_class {
     my $self = shift;
     my ( $file_name, $file_path ) = @_;
@@ -55,8 +65,11 @@ sub rebuild {
     $self->SUPER::rebuild;
 
     my $app = Docs::app();
+    my $books = $self->books;
     opendir(my $dh, $self->file_path) || return;
     while( my $entry = readdir($dh) ) {
+        $books->cancel_rebuild_if;
+
         $entry = Encode::decode_utf8($entry) unless utf8::is_utf8($entry);
 
         next if $entry =~ /^\./;

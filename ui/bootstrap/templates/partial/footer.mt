@@ -4,7 +4,7 @@
       <footer>
         <? block footer => sub { ?>
           &copy;<?= raw($ctx->document->ctx_copyright($ctx)); ?>
-          Powered by <a href="https://docs.ideamans.com/docs">docs <?= $Docs::VERSION ?></a>
+          Powered by <a href="http://docs.ideamans.com/docs/">docs <?= $Docs::VERSION ?></a>
         <? } ?>
       </footer>
 

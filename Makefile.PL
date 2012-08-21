@@ -2,6 +2,8 @@ use inc::Module::Install;
 name 'Docs';
 all_from 'lib/Docs.pm';
 
+requires 'Time::HiRes' => '';
+requires 'Try::Tiny' => '';
 requires 'Any::Moose' => '0.18';
 requires 'Carp' => '1.25';
 requires 'DateTime' => '0.76';

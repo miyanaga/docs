@@ -4,6 +4,9 @@ use strict;
 use warnings;
 use parent 'Tatsumaki::Application';
 
+use Time::HiRes;
+use Try::Tiny;
+use AnyEvent;
 use Any::Moose;
 use Sweets::Application::Components;
 use Sweets::Code::Binding;
@@ -74,17 +77,26 @@ has preferred_lang => ( is => 'ro', isa => 'Str', lazy_build => 1, builder => su
     my $self = shift;
     $self->config->cascade_find(qw/preferred_lanauge/)->as_scalar || 'en';
 });
+has rebuild_started => ( is => 'rw', isa => 'Num', default => 0 );
 
 sub rebuild_books {
     my $self = shift;
+    my $started = Time::HiRes::time;
+    $self->rebuild_started($started);
+
     my $books = Docs::Model::Node::Books->new;
+    $books->rebuild_started($started);
 
-    $books->naming->title('Docs');
-    $books->uri_name( '' );
-    $books->file_name( $self->books_path );
-    $books->rebuild;
+    try {
+        $books->naming->title('Docs');
+        $books->uri_name( '' );
+        $books->file_name( $self->books_path );
+        $books->rebuild;
 
-    $self->books($books);
+        $self->books($books);
+    } catch {
+        print STDERR "Rebuild cancled: $_\n";
+    };
 }
 
 sub language {
@@ -168,6 +180,7 @@ sub init {
     }
 
     $self->rebuild_books;
+
 }
 
 sub compile_psgi_app {

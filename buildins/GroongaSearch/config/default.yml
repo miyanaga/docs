@@ -41,6 +41,10 @@ context_methods:
         package: Docs::Model::Node::Book
         method: groonga_migrate
         code: Docs::Component::GroongaSearch::ContextMethod::groonga_migrate
+    groonga.book.cleanup:
+        package: Docs::Model::Node::Book
+        method: groonga_cleanup
+        code: Docs::Component::GroongaSearch::ContextMethod::groonga_cleanup
     groonga.node.groonga_step_paths:
         package: Docs::Model::Node
         method: groonga_step_paths

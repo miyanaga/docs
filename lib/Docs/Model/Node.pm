@@ -20,10 +20,10 @@ has metadata => ( is => 'rw', isa => 'Docs::Model::Node::Metadata', lazy_build =
     shift->new_metadata;
 });
 has books => ( is => 'ro', isa => 'Any', lazy_build => 1, builder => sub {
-    shift->parent_at(0) || 0;
+    shift->parent_at(0);
 });
 has book => ( is => 'ro', isa => 'Any', lazy_build => 1, builder => sub {
-    shift->parent_at(1) || 0;
+    shift->parent_at(1);
 });
 has id => ( is => 'ro', isa => 'Str', lazy => 1, default => sub {
     my $id = shift->metadata->find('id')->as_scalar;
@@ -58,6 +58,19 @@ sub file_path { shift->build_path('file', '/') }
 
 sub find_uri { shift->find('uri', @_) };
 sub find_file { shift->find('file', @_) };
+
+sub absolute_url_of {
+    my $self = shift;
+    my ( $path ) = @_;
+    return if !defined($path) || $path eq '';
+
+    my $head = substr( $path, 0, 1 );
+    if ( $head eq '/' ) {
+        return $path;
+    } else {
+        return $self->folder->normalized_uri_path . $path;
+    }
+}
 
 sub path_find {
     my $self = shift;
@@ -100,6 +113,13 @@ sub folder {
     $self->is_folder? $self: $self->parent || $self;
 }
 
+sub document {
+    my $self = shift;
+    $self->is_folder
+        ? ( $self->index_node || $self )
+        : $self;
+}
+
 sub index_node {
     shift->find_uri('index');
 }
@@ -128,6 +148,8 @@ after rebuild => sub {
 
 sub rebuild {
     my $self = shift;
+    $self->books->cancel_rebuild_if;
+
     my $app = Docs::app();
 
     $self->clear_metadata;

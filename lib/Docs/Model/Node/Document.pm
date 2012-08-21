@@ -41,7 +41,7 @@ sub formatted_body {
 
 sub rebuild {
     my $self = shift;
-
+    $self->books->cancel_rebuild_if;
     $self->SUPER::rebuild;
 }
 

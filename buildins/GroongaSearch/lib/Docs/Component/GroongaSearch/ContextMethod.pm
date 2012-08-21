@@ -80,6 +80,22 @@ sub groonga_migrate {
     1;
 }
 
+sub groonga_cleanup {
+    my $book = shift;
+    my $ctx = shift;
+    my $books = $book->books;
+
+    my $groonga = $book->ctx_groonga_console($ctx);
+    my $request = Groonga::Console::Simple::Request::Delete->new(
+        args => {
+            table => 'Node',
+            filter => 'timestamp < ' . $books->rebuild_started
+        }
+    );
+
+    my $result = $request->execute($groonga);
+}
+
 sub groonga_headlines {
     my $node = shift;
     my $ctx = shift;
@@ -109,6 +125,8 @@ sub groonga_load {
     my $ctx = shift;
     return if $node->ctx_hidden($ctx);
 
+    my $books = $node->books;
+    $books->cancel_rebuild_if;
     my $book = $node->book || Carp::confess('book not found');
     my @tags = $node->ctx_tags_include_body($ctx);
 
@@ -123,7 +141,7 @@ sub groonga_load {
         $data{tags} = $tags;
         $data{lead} = $node->ctx_lead($ctx) || '';
         $data{text} = $node->ctx_plain_text_without_headlines($ctx) || '';
-        $data{tags} = $node->ctx_raw_tags($ctx) || [];
+        $data{tags} = [ map { $_->raw } @tags ];
         $data{updated_on} = $node->file_mtime || 0;
         $data{timestamp} = Time::HiRes::time || 0;
 
@@ -248,7 +266,7 @@ sub search {
     );
 
     my $groonga_res;
-    if ( $keyword =~ /^tag:([^\s]+)/ ) {
+    if ( $keyword =~ /^tag:(.+)/ ) {
         my $tag = $1;
         $pager_res->search_type('tag');
         $pager_res->search_tag(Docs::Model::Node::Tag->new(node => $book, raw => $tag));

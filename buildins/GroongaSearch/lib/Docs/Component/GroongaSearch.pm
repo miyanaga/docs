@@ -10,8 +10,10 @@ use Groonga::Console::Simple::Request;
 
 sub on_node_pre_rebuild {
     my ( $cb, $node ) = @_;
-    my $app = Docs::app();
+    return if $node->is_books;
+    $node->books->cancel_rebuild_if;
 
+    my $app = Docs::app();
     if ( $node->is_book ) {
         for my $l ( @{$node->languages} ) {
             my $ctx = $app->new_context(lang => $l->key);
@@ -22,34 +24,22 @@ sub on_node_pre_rebuild {
 
 sub on_node_post_rebuild {
     my ( $cb, $node ) = @_;
+    return if $node->is_books;
+    $node->books->cancel_rebuild_if;
 
-    if ( eval { $node->isa('Docs::Model::Node::Book') } ) {
-        _on_book_post_rebuild(@_);
-    } elsif (
-        eval { $node->isa('Docs::Model::Node::Folder') }
-        || eval { $node->isa('Docs::Model::Node::Document') }
-        ) {
-        _on_node_post_rebuild(@_);
-    }
-}
-
-sub _on_node_post_rebuild {
-    my ( $cb, $node ) = @_;
     my $app = Docs::app();
-    my $book = $node->book || return;
-
-    for my $l ( @{$book->languages} ) {
-        my $ctx = $app->new_context(lang => $l->key);
-        $node->ctx_groonga_load($ctx);
+    if ( $node->is_book ) {
+        for my $l ( @{$node->languages} ) {
+            my $ctx = $app->new_context(lang => $l->key);
+            $node->ctx_groonga_cleanup($ctx);
+        }
+    } elsif ( $node->is_folder || $node->is_document ) {
+        my $book = $node->book;
+        for my $l ( @{$book->languages} ) {
+            my $ctx = $app->new_context(lang => $l->key);
+            $node->ctx_groonga_load($ctx);
+        }
     }
-}
-
-sub _on_book_pre_rebuild {
-    my ( $cb, $node ) = @_;
-}
-
-sub _on_book_post_rebuild {
-    my ( $cb, $node ) = @_;
 }
 
 1;

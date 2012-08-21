@@ -48,6 +48,17 @@ has languages => ( is => 'ro', isa => 'ArrayRef', lazy_build => 1, builder => su
 
 has node_index => ( is => 'ro', isa => 'HashRef', default => sub { {} } );
 
+has rebuild_started => ( is => 'rw', isa => 'Num', default => 0 );
+
+sub cancel_rebuild_if {
+    my $self = shift;
+    my $app = Docs::app();
+    my $current = $self->rebuild_started;
+    my $started = $app->rebuild_started;
+    die "Current process: started at $current expired because restarted at $started"
+        if $app->rebuild_started != $self->rebuild_started;
+}
+
 sub set_node_by_id {
     my $self = shift;
     my ( $node ) = @_;

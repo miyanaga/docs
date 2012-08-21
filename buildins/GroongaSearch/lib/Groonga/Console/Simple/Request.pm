@@ -203,5 +203,24 @@ sub execute {
 no Any::Moose;
 __PACKAGE__->meta->make_immutable;
 
+package Groonga::Console::Simple::Request::Delete;
+
+use strict;
+use warnings;
+
+use Any::Moose;
+use base 'Groonga::Console::Simple::Request';
+use JSON;
+
+sub BUILD {
+    my $self = shift;
+
+    $self->command('delete');
+    $self->result_class('Groonga::Console::Simple::Result');
+}
+
+no Any::Moose;
+__PACKAGE__->meta->make_immutable;
+
 1;
 __END__

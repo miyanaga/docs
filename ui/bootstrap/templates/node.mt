@@ -75,13 +75,24 @@ my $caption = $node->metadata->ctx_cascade_find($ctx, 'caption')->as_scalar || '
         <? } ?>
 
         <? if ( $document->is_folder || $document->is_index ) { ?>
-            <section class="node-children">
-                <? if ( my @children = $folder->ctx_children($ctx) ) { ?>
+            <? my $montage_figures = $document->metadata->ctx_cascade_find($ctx, qw/montage figures/)->as_scalar || 30; ?>
+            <? if ( my @figures = $document->ctx_all_figures($ctx, $montage_figures) ) { ?>
+            <section class="docs-figures" data-caption="<?= $caption ?>">
+                <? for my $f ( @figures ) { ?>
+                    <a href="<?= $f->{node}->normalized_uri_path ?>">
+                        <img alt="<?= $f->{alt} ?>" src="<?= $f->{src} ?>">
+                    </a>
+                <? } ?>
+            </section>
+            <? } ?>
+
+            <? if ( my @children = $folder->ctx_children($ctx) ) { ?>
+            <section class="docs-node-children">
                     <? for my $child ( @children ) { ?>
                         <?= include 'partial/node/digest', node => $child, sitemap => 1; ?>
                     <? } ?>
-                <? } ?>
             </section>
+            <? } ?>
         <? } ?>
 
         <footer class="docs-node-footer">

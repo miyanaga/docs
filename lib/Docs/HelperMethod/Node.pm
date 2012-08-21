@@ -20,9 +20,11 @@ sub link_to_node {
         : $node->ctx_title($ctx);
 
     if ($tags) {
+        $args{inner} .= '<span class="docs-tags">';
         for my $tag ( $node->ctx_tags($ctx) ) {
             $args{inner} .= ' ' . $self->link_to_tag($tag, nolink => 1);
         }
+        $args{inner} .= '</span>';
     }
 
     delete $args{attr}->{href} if $args{attr};

@@ -1,10 +1,11 @@
-section.docs-node-body div.caption {
+div.caption {
 	margin: 0;
 	padding:0;
 	position: relative;
+	border: 1px solid #e3e3e3;
 }
 
-section.docs-node-body div.caption p {
+div.caption p {
 	position: absolute;
 	margin: 0; padding: 2px;
 	font-size: .9em;
@@ -16,6 +17,6 @@ section.docs-node-body div.caption p {
 	opacity: .7;
 }
 
-section.docs-node-body div.caption img {
+div.caption img {
 	margin: 0; padding: 0;
 }

@@ -5,5 +5,6 @@
         <?= include 'partial/navigation/sitemap' ?>
 ? #        <?= include 'partial/navigation/recent' ?>
         <?= include 'partial/navigation/tags' ?>
+        <?= include 'partial/navigation/figures' ?>
     </div>
 </div>

@@ -126,6 +126,29 @@ sub relations {
     $self->render('partial/node/relations', nodes => \@nodes );
 }
 
+sub navigation_figures {
+    my $self = shift;
+    my $ctx = $self->context;
+    my $node = $self->node;
+
+    my $offset = int($self->request->parameters->get('offset') || 0);
+    my $limit = $node->metadata->ctx_cascade_find($ctx, qw/navigation figures/)->as_scalar || 10;
+    my $until = $offset + $limit;
+
+    my @figures = $node->ctx_all_figures($ctx);
+    my $next = scalar @figures > $until? $until: 0;
+    $until = scalar @figures unless $next;
+    @figures = @figures[$offset..$until - 1];
+
+    $self->render('partial/node/figures',
+        node => $node,
+        figures => \@figures,
+        offset => $offset,
+        limit => $limit,
+        next => $next
+    );
+}
+
 sub glossary {
     my $self = shift;
     my $ctx = $self->context;
