@@ -75,7 +75,7 @@ has languages => ( is => 'ro', isa => 'HashRef', lazy_build => 1, builder => sub
 });
 has preferred_lang => ( is => 'ro', isa => 'Str', lazy_build => 1, builder => sub {
     my $self = shift;
-    $self->config->cascade_find(qw/preferred_lanauge/)->as_scalar || 'en';
+    $self->config->cascade_find(qw/preferred_language/)->as_scalar || 'en';
 });
 has rebuild_started => ( is => 'rw', isa => 'Num', default => 0 );
 

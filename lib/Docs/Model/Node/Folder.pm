@@ -24,8 +24,7 @@ has empty_metadata => ( is => 'rw', isa => 'Docs::Model::Node::Metadata', lazy_b
 has index_metadata => ( is => 'rw', isa => 'Docs::Model::Node::Metadata', lazy_build => 1, builder => sub {
     my $self = shift;
     if ( my $index = $self->index_node ) {
-        my $metadata = Docs::Model::Node::Metadata->new;
-        %$metadata = %{$index->metadata};
+        my $metadata = Docs::Model::Node::Metadata->new( $index->metadata->raw );
         $metadata->node($self);
         return $metadata;
     }
@@ -86,6 +85,8 @@ sub rebuild {
         }
     }
     closedir($dh);
+
+    $self->clear_index_metadata;
 }
 
 sub ensure {
