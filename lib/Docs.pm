@@ -8,11 +8,32 @@ our $NAME = 'Docs';
 our $VERSION = '0.70';
 our $APP_CLASS = 'Docs::Application';
 
+our $is_debug = 0;
+our $debug_log_file;
+
 use Docs::Application;
 
 sub app {
     shift if eval { $_[0] && $_[0] eq 'Docs' };
     $APP_CLASS->instance(@_);
+}
+
+sub log {
+    return unless $is_debug;
+
+    my @logs = map {
+            ref $_ eq 'CODE'
+                ? $_->()
+                : $_;
+        } @_;
+
+    if ( defined $debug_log_file ) {
+        open(my $dh, '>>', $debug_log_file) or return;
+        print $dh @logs, "\n";
+        close $dh;
+    } else {
+        print STDERR @logs, "\n";
+    }
 }
 
 1;

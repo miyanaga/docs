@@ -47,6 +47,8 @@ has is_admin => ( is => 'rw', isa => 'Bool', lazy => 1, default => sub {
         for my $header ( @$headers ) {
             my $value = $self->handler->request->env->{$header}
                 || next;
+            my @ips = split /\s*,\s*/, $value;
+            $value = pop @ips;
             my $remote = NetAddr::IP->new($value);
             for my $subnet ( @$subnets ) {
                 $subnet = NetAddr::IP->new($subnet);

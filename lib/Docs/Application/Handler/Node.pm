@@ -40,6 +40,12 @@ sub get {
     my $ctx = $self->context;
     my $node = $self->node;
 
+    Docs::log($self, ': GET request to ', $self->request->path_info, sub {
+        my $env = $self->request->env;
+        defined $env->{QUERY_STRING} ? '?'.$env->{QUERY_STRING} : '';
+    })
+        if $Docs::is_debug;
+
     # Dispatch action
     my $action_result = $self->dispatch_action;
     return $action_result if defined($action_result);
@@ -51,6 +57,9 @@ sub get {
 
     # Refine path
     if ( $node->normalized_uri_path ne $self->request->path_info ) {
+        Docs::log($self, ': Reroute from directory to file: ', $node->normalized_uri_path)
+            if $Docs::is_debug;
+
         return $self->redirect($node);
     }
 
@@ -58,6 +67,8 @@ sub get {
 
     # Prerender html because Text::MicroTemplate::Extend can't render nestedly
     my $html = $node->ctx_html($ctx);
+    Docs::log($self, ': HTML generated, the length: ', length($html))
+        if $Docs::is_debug;
 
     $self->render($template, html => $html);
 }

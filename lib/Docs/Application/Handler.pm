@@ -22,7 +22,12 @@ sub render {
     my $ctx = $self->context;
     my $app = Docs::app();
 
-    $self->finish($app->ui->ctx_render( $ctx, $file, {}, @_ )->as_string);
+    my $result = $app->ui->ctx_render( $ctx, $file, {}, @_ )->as_string;
+
+    Docs::log($self, ': Template rendered, the length: ', length($result))
+        if $Docs::is_debug;
+
+    $self->finish($result);
 }
 
 sub dispatch_action {

@@ -95,7 +95,7 @@ sub rebuild_books {
 
         $self->books($books);
     } catch {
-        print STDERR "Rebuild cancled: $_\n";
+        print STDERR "Rebuild canceled: $_\n";
     };
 }
 
@@ -137,6 +137,15 @@ after init => sub {
 
 sub init {
     my $self = shift;
+
+    # Debugging
+    if ( $self->config->cascade_find(qw/debug log/)->as_scalar ) {
+        $Docs::is_debug = 1;
+
+        if ( my $log_file = $self->config->cascade_find(qw/debug log_file/)->as_scalar ) {
+            $Docs::debug_log_file = $log_file;
+        }
+    }
 
     # Library paths.
     push @INC, $self->components->dir_paths_to('lib');
