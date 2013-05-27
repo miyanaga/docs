@@ -8,7 +8,7 @@ use Any::Moose;
 
 has languages => ( is => 'ro', isa => 'ArrayRef', lazy_build => 1, builder => sub {
     my $self = shift;
-    my @langs = $self->metadata->cascade_find([qw/languages langs/])->as_array;
+    my @langs = $self->metadata->cascade_find(qw/languages/)->as_array;
 
     my $app = Docs::app();
     $langs[0] ||= $app->preferred_lang;
@@ -16,6 +16,7 @@ has languages => ( is => 'ro', isa => 'ArrayRef', lazy_build => 1, builder => su
 
     \@languages;
 });
+
 has preferred_language => ( is => 'ro', isa => 'Str', lazy_build => 1, builder => sub {
     my $self = shift;
     my $languages = $self->languages;
@@ -23,6 +24,13 @@ has preferred_language => ( is => 'ro', isa => 'Str', lazy_build => 1, builder =
     my $app = Docs::app();
     $languages->[0] || $app->preferred_language;
 });
+
+sub rebuild {
+    my $self = shift;
+    $self->SUPER::rebuild;
+    $self->clear_languages;
+    $self->clear_preferred_language;
+}
 
 no Any::Moose;
 __PACKAGE__->meta->make_immutable;
